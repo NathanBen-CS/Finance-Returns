@@ -1,0 +1,127 @@
+{
+  "n_companies": 61,
+  "n_sectors": 11,
+  "n_events": 286,
+  "n_reactions": 286,
+  "deepdive_tickers": [
+    "AAPL",
+    "AMT",
+    "AMZN",
+    "BA",
+    "GOOGL",
+    "GS",
+    "JNJ",
+    "JPM",
+    "LIN",
+    "META",
+    "MSFT",
+    "NEE",
+    "PG",
+    "UNH",
+    "XOM"
+  ],
+  "cyber_tickers": [
+    "AMGN",
+    "BSX",
+    "CPNG",
+    "FFIV"
+  ],
+  "event_category_counts": {
+    "Financial/Earnings": 115,
+    "Management/Governance": 77,
+    "Other": 71,
+    "M&A/Contracts": 17,
+    "Security Incident": 4,
+    "Legal/Regulatory": 2
+  },
+  "filing_timeliness_counts": {
+    "On-time": 268,
+    "Slightly Late": 18
+  },
+  "reaction_category_counts": {
+    "Strong Negative": 73,
+    "Positive": 70,
+    "Negative": 66,
+    "Strong Positive": 50,
+    "Neutral": 27
+  },
+  "selection_method_counts": {
+    "random_stratified": 42,
+    "purposive_deep_dive": 15,
+    "purposive_cyber_incident": 4
+  },
+  "mean_abnormal_pct": -0.153,
+  "std_abnormal_pct": 2.99,
+  "min_abnormal_pct": -20.014,
+  "max_abnormal_pct": 12.335,
+  "extremes_negative": [
+    {
+      "ticker": "UNH",
+      "company_name": "UnitedHealth Group",
+      "event_category": "Financial/Earnings",
+      "report_date": "2026-01-27",
+      "abnormal_return": -20.0
+    },
+    {
+      "ticker": "BSX",
+      "company_name": "Boston Scientific",
+      "event_category": "Financial/Earnings",
+      "report_date": "2026-02-04",
+      "abnormal_return": -17.1
+    },
+    {
+      "ticker": "META",
+      "company_name": "Meta Platforms",
+      "event_category": "Other",
+      "report_date": "2025-10-30",
+      "abnormal_return": -10.3
+    }
+  ],
+  "extremes_positive": [
+    {
+      "ticker": "CPNG",
+      "company_name": "Coupang, Inc.",
+      "event_category": "Management/Governance",
+      "report_date": "2026-06-11",
+      "abnormal_return": 12.3
+    },
+    {
+      "ticker": "GS",
+      "company_name": "Goldman Sachs",
+      "event_category": "Financial/Earnings",
+      "report_date": "2026-07-14",
+      "abnormal_return": 8.6
+    },
+    {
+      "ticker": "BSX",
+      "company_name": "Boston Scientific",
+      "event_category": "Financial/Earnings",
+      "report_date": "2026-04-22",
+      "abnormal_return": 7.9
+    }
+  ],
+  "sector_counts": {
+    "Financials": 9,
+    "Health Care": 9,
+    "Industrials": 9,
+    "Information Technology": 9,
+    "Consumer Discretionary": 6,
+    "Consumer Staples": 4,
+    "Utilities": 4,
+    "Communication Services": 3,
+    "Materials": 3,
+    "Real Estate": 3,
+    "Energy": 2
+  },
+  "size_category_counts": {
+    "Small": 16,
+    "Large": 16,
+    "Mid": 15,
+    "Mega-cap": 14
+  },
+  "n_missing_marketcap": 0,
+  "n_missing_financials": 1,
+  "report_date_min": "2025-09-02",
+  "report_date_max": "2026-09-14",
+  "same_day_pairs": 16
+}

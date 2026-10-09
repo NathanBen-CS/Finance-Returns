@@ -1,0 +1,62 @@
+ticker,company_name,sector,sub_industry,exchange,cik,founded_year,size_category,market_cap,revenue_ttm,employees,selection_method
+GOOGL,Alphabet Inc. (Class A),Communication Services,Interactive Media & Services,NMS,1652044,1998,Mega-cap,4193277706240,445865984000.0,198933.0,purposive_deep_dive
+META,Meta Platforms,Communication Services,Interactive Media & Services,NMS,1326801,2004,Mega-cap,1715261407232,228246994944.0,75472.0,purposive_deep_dive
+TKO,TKO Group Holdings,Communication Services,Movies & Entertainment,NYQ,1973266,2023,Mid,36421169152,5301862912.0,4000.0,random_stratified
+AMZN,Amazon,Consumer Discretionary,Broadline Retail,NMS,1018724,1994,Mega-cap,2653001613312,775680032768.0,1595000.0,purposive_deep_dive
+AZO,AutoZone,Consumer Discretionary,Automotive Retail,NYQ,866787,1979,Mid,46513061888,20338554880.0,78000.0,random_stratified
+GRMN,Garmin,Consumer Discretionary,Consumer Electronics,NYQ,1121788,1989,Mid,53406654464,7671437824.0,23000.0,random_stratified
+HD,Home Depot (The),Consumer Discretionary,Home Improvement Retail,NYQ,354950,1978,Mega-cap,301771161600,169176006656.0,470000.0,random_stratified
+WYNN,Wynn Resorts,Consumer Discretionary,Casinos & Gaming,NMS,1174922,2002,Small,8672975872,7413425152.0,28500.0,random_stratified
+BG,Bunge Global,Consumer Staples,Agricultural Products & Services,NYQ,1996862,1818,Small,22502912000,91818999808.0,34000.0,random_stratified
+CL,Colgate-Palmolive,Consumer Staples,Household Products,NYQ,21665,1806,Large,69369970688,21046999040.0,33600.0,random_stratified
+KO,Coca-Cola Company (The),Consumer Staples,Soft Drinks & Non-alcoholic Beverages,NYQ,21344,1886,Mega-cap,378064994304,50128998400.0,65900.0,random_stratified
+PG,Procter & Gamble,Consumer Staples,Personal Care Products,NYQ,80424,1837,Mega-cap,341479292928,87031996416.0,104000.0,purposive_deep_dive
+EXE,Expand Energy,Energy,Oil & Gas Exploration & Production,NMS,895126,1989,Small,20543645696,12657999872.0,1600.0,random_stratified
+XOM,ExxonMobil,Energy,Integrated Oil & Gas,NYQ,2115436,1999,Mega-cap,671557484544,361060007936.0,57900.0,purposive_deep_dive
+ACGL,Arch Capital Group,Financials,Property & Casualty Insurance,NMS,947484,1995,Mid,33088989184,19232000000.0,8000.0,random_stratified
+FISV,Fiserv,Financials,Transaction & Payment Processing Services,NMS,798354,1984,Small,24120938496,,,random_stratified
+GS,Goldman Sachs,Financials,Investment Banking & Brokerage,NYQ,886982,1869,Large,273112940544,67569999872.0,46200.0,purposive_deep_dive
+IVZ,Invesco,Financials,Asset Management & Custody Banks,NYQ,914208,1935,Small,13280313344,6902499840.0,7405.0,random_stratified
+JPM,JPMorgan Chase,Financials,Diversified Banks,NYQ,19617,2000,Mega-cap,927494373376,186328006656.0,320560.0,purposive_deep_dive
+KKR,KKR & Co.,Financials,Asset Management & Custody Banks,NYQ,1404912,1976,Large,89440501760,25833117696.0,5043.0,random_stratified
+PRU,Prudential Financial,Financials,Life & Health Insurance,NYQ,1137774,1875,Mid,40378802176,65223999488.0,36607.0,random_stratified
+PYPL,PayPal,Financials,Transaction & Payment Processing Services,NMS,1633917,1998,Mid,45091340288,34127998976.0,23800.0,random_stratified
+WFC,Wells Fargo,Financials,Diversified Banks,NYQ,72971,1852,Large,263239139328,83026001920.0,197466.0,random_stratified
+CI,Cigna,Health Care,Health Care Services,NYQ,1739940,1982,Large,74106249216,282382008320.0,65669.0,random_stratified
+DVA,DaVita,Health Care,Health Care Services,NYQ,927066,1979,Small,12368268288,14009646080.0,78000.0,random_stratified
+EW,Edwards Lifesciences,Health Care,Health Care Equipment,NYQ,1099800,1958,Mid,51460993024,6512300032.0,16000.0,random_stratified
+JNJ,Johnson & Johnson,Health Care,Pharmaceuticals,NYQ,200406,1886,Mega-cap,644117692416,97929003008.0,138200.0,purposive_deep_dive
+MDT,Medtronic,Health Care,Health Care Equipment,NYQ,1613103,1949,Large,118448168960,37541998592.0,95000.0,random_stratified
+UHS,Universal Health Services,Health Care,Health Care Facilities,NYQ,352915,1979,Small,10679886848,18114486272.0,102000.0,random_stratified
+UNH,UnitedHealth Group,Health Care,Managed Health Care,NYQ,731766,1977,Mega-cap,336831447040,450525986816.0,390000.0,purposive_deep_dive
+AME,Ametek,Industrials,Electrical Components & Equipment,NYQ,1037868,1930,Mid,53232168960,7863923200.0,22500.0,random_stratified
+BA,Boeing,Industrials,Aerospace & Defense,NYQ,12927,1916,Large,159623135232,93994999808.0,182000.0,purposive_deep_dive
+GEV,GE Vernova,Industrials,Heavy Electrical Equipment,NYQ,1996810,2024,Large,246382542848,41366999040.0,78000.0,random_stratified
+OTIS,Otis Worldwide,Industrials,Industrial Machinery & Supplies & Components,NYQ,1781335,2020,Mid,26361352192,14910999552.0,72000.0,random_stratified
+PCAR,Paccar,Industrials,Construction Machinery & Heavy Transportation Equipment,NMS,75362,1905,Large,62226866176,27815800832.0,25900.0,random_stratified
+ROK,Rockwell Automation,Industrials,Electrical Components & Equipment,NYQ,1024478,1903,Mid,46169788416,8972999680.0,26000.0,random_stratified
+SWK,Stanley Black & Decker,Industrials,Industrial Machinery & Supplies & Components,NYQ,93556,1843,Small,13448032256,15247699968.0,41000.0,random_stratified
+VLTO,Veralto,Industrials,Environmental & Facilities Services,NYQ,1967680,2023,Small,23343212544,5696000000.0,17000.0,random_stratified
+XYL,Xylem Inc.,Industrials,Industrial Machinery & Supplies & Components,NYQ,1524472,2011,Small,25046130688,9125999616.0,22000.0,random_stratified
+AAPL,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",NMS,320193,1977,Mega-cap,4851251544064,466822987776.0,150000.0,purposive_deep_dive
+CIEN,Ciena,Information Technology,Communications Equipment,NYQ,936395,1992,Mid,48285802496,6020894208.0,8898.0,random_stratified
+GDDY,GoDaddy,Information Technology,Internet Services & Infrastructure,NYQ,1609711,1997,Small,12549520384,5104099840.0,5845.0,random_stratified
+HPQ,HP Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",NYQ,47217,1939,Mid,29488566272,59162001408.0,55000.0,random_stratified
+INTC,Intel,Information Technology,Semiconductors,NMS,50863,1968,Mega-cap,534160932864,57031999488.0,85100.0,random_stratified
+MSFT,Microsoft,Information Technology,Systems Software,NMS,789019,1975,Mega-cap,3640745000960,331839012864.0,223000.0,purposive_deep_dive
+MU,Micron Technology,Information Technology,Semiconductors,NMS,723125,1978,Mega-cap,1046439198720,90273996800.0,53000.0,random_stratified
+SWKS,Skyworks Solutions,Information Technology,Semiconductors,NMS,4127,2002,Small,12878964736,4014099968.0,10000.0,random_stratified
+ALB,Albemarle Corporation,Materials,Specialty Chemicals,NYQ,915913,1994,Small,12918013952,5907904000.0,7800.0,random_stratified
+LIN,Linde plc,Materials,Industrial Gases,NMS,1707925,1879,Large,213014315008,35448999936.0,64649.0,purposive_deep_dive
+SW,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,NYQ,2005951,1934,Small,23383232512,31325999104.0,96000.0,random_stratified
+AMT,American Tower,Real Estate,Telecom Tower REITs,NYQ,1053507,1995,Large,82190696448,10941500416.0,4866.0,purposive_deep_dive
+IRM,Iron Mountain,Real Estate,Other Specialized REITs,NYQ,1020569,1951,Mid,33387370496,7562470912.0,29400.0,random_stratified
+WELL,Welltower,Real Estate,Health Care REITs,NYQ,766704,1970,Large,168974139392,12763214848.0,712.0,random_stratified
+AEE,Ameren,Utilities,Multi-Utilities,NYQ,1002910,1902,Mid,28525930496,8410999808.0,8913.0,random_stratified
+NEE,NextEra Energy,Utilities,Multi-Utilities,NYQ,753308,1984,Large,167650082816,28700000256.0,17400.0,purposive_deep_dive
+PNW,Pinnacle West Capital,Utilities,Multi-Utilities,NYQ,764622,1985,Small,11512524800,5554253824.0,6610.0,random_stratified
+SO,Southern Company,Utilities,Electric Utilities,NYQ,92122,1945,Large,99195805696,30179000320.0,29502.0,random_stratified
+FFIV,"F5, Inc.",Information Technology,Communications Equipment,NMS,1048695,1996,Mid,25124347904,3309331968.0,6512.0,purposive_cyber_incident
+CPNG,"Coupang, Inc.",Consumer Discretionary,Broadline Retail,NYQ,1834584,2010,Small,24805660672,35462000640.0,108000.0,purposive_cyber_incident
+AMGN,Amgen,Health Care,Biotechnology,NMS,318154,1980,Large,220183183360,38094999552.0,31500.0,purposive_cyber_incident
+BSX,Boston Scientific,Health Care,Health Care Equipment,NYQ,885725,1979,Large,62650191872,20995999744.0,59000.0,purposive_cyber_incident

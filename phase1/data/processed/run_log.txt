@@ -1,0 +1,187 @@
+EECS 4412 Phase 1 pipeline run: 2026-09-29 23:28:29
+SEC User-Agent: EECS4412 Student Project nathanbenayguev9@gmail.com
+[sample] Using existing companies_sample_57.csv (57 rows).
+
+[companies] Fetching fundamentals from yfinance ...
+    [yf info] AZO: partial payload, Yahoo omitted ['fullTimeEmployees']
+    [companies] AZO: 'fullTimeEmployees' missing from Yahoo now -> kept real value 78000 from the 2026-09-16 lookup
+    [yf info] FISV: trying Yahoo symbol 'FI' first (Fiserv rebranded FISV -> FI in July 2023), falling back to 'FISV'; CSV keeps ticker 'FISV'
+    [yf info] FISV as 'FI' attempt 1 failed (empty info payload); sleeping 2s
+    [yf info] FISV as 'FI' attempt 2 failed (empty info payload); sleeping 4s
+    [yf info] FISV as 'FI' attempt 3 failed (empty info payload); sleeping 8s
+    [yf info] FISV: partial payload, Yahoo omitted ['totalRevenue', 'fullTimeEmployees']
+    [companies] FISV: 'totalRevenue' not provided by Yahoo -> left blank
+    [companies] FISV: 'fullTimeEmployees' not provided by Yahoo -> left blank
+    [founded_year] JPM: '2000 (1799 / 1871)' -> 2000
+    [founded_year] OTIS: '2020 (1853, United Technologies spinoff)' -> 2020
+    [founded_year] HPQ: '1939 (2015)' -> 1939
+    [founded_year] NEE: '1984 (1925)' -> 1984
+    [size_category] quartile edges (USD): 8,672,975,872, 25,046,130,688, 53,406,654,464, 273,112,940,544, 4,851,251,544,064
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-001.json (2025-08-13..2025-09-14)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-002.json (2025-07-10..2025-08-11)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-003.json (2025-06-03..2025-07-08)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-004.json (2025-04-25..2025-06-01)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-005.json (2025-03-21..2025-04-23)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-006.json (2025-02-19..2025-03-19)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-007.json (2025-01-14..2025-02-17)
+    [sec] CIK 19617: recent only reaches 2025-09-16; also loaded CIK0000019617-submissions-008.json (2024-12-03..2025-01-12)
+    [sec] CIK 886982: recent only reaches 2025-09-16; also loaded CIK0000886982-submissions-001.json (2025-06-17..2025-09-14)
+    [sec] CIK 886982: recent only reaches 2025-09-16; also loaded CIK0000886982-submissions-002.json (2025-03-31..2025-06-15)
+    [sec] CIK 886982: recent only reaches 2025-09-16; also loaded CIK0000886982-submissions-003.json (2025-01-28..2025-03-29)
+    [sec] CIK 886982: recent only reaches 2025-09-16; also loaded CIK0000886982-submissions-004.json (2024-10-31..2025-01-26)
+
+[events] Window used: 2025-09-01 to 2026-09-17 (default); 240 8-K filings in window
+    per-ticker 8-K counts in window:
+      AAPL     8  (by CIK: {320193: 8})
+      MSFT     9  (by CIK: {789019: 9})
+      JNJ      9  (by CIK: {200406: 9})
+      UNH     15  (by CIK: {731766: 15})
+      JPM     26  (by CIK: {19617: 26})
+      GS      21  (by CIK: {886982: 21})
+      AMZN    16  (by CIK: {1018724: 16})
+      GOOGL   18  (by CIK: {1652044: 18})
+      META    11  (by CIK: {1326801: 11})
+      BA       9  (by CIK: {12927: 9})
+      PG      17  (by CIK: {80424: 17})
+      XOM     18  (by CIK: {34088: 15, 2115436: 3})
+      NEE     28  (by CIK: {753308: 28})
+      LIN      9  (by CIK: {1707925: 9})
+      AMT     26  (by CIK: {1053507: 26})
+    primary item codes not in mapping (-> 'Other'): ['9.01']
+    [category mapping] counts under original spec map (v1) vs revised map (v2), over all in-window filings:
+      Capital/Financing        v1= 34  v2=  0  (-34)
+      Financial/Earnings       v1= 62  v2= 96  (+34)
+      Legal/Regulatory         v1=  0  v2=  2  (+2)
+      M&A/Contracts            v1= 13  v2= 13  (+0)
+      Management/Governance    v1= 51  v2= 63  (+12)
+      Other                    v1= 80  v2= 66  (-14)
+    [category mapping] 48 filings changed category; by primary item:
+      item 3.03: 2 filings  Other -> Legal/Regulatory
+      item 5.07: 12 filings  Other -> Management/Governance
+      item 7.01: 34 filings  Capital/Financing -> Financial/Earnings
+
+[prices] Daily prices 2025-07-19 .. 2026-09-30 (end exclusive)
+    [prices] ^GSPC: reusing cache (2025-07-21..2026-09-29, covers required 2026-09-23)
+    ^GSPC: 301 trading days, last available 2026-09-29
+    [prices] AAPL: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-08)
+    [prices] MSFT: reusing cache (2025-07-21..2026-09-16, covers required 2026-09-11)
+    [prices] JNJ: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-13)
+    [prices] UNH: reusing cache (2025-07-21..2026-09-29, covers required 2026-09-17)
+    [prices] JPM: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-01)
+    [prices] GS: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-20)
+    [prices] AMZN: reusing cache (2025-07-21..2026-09-29, covers required 2026-09-23)
+    [prices] GOOGL: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-19)
+    [prices] META: reusing cache (2025-07-21..2026-09-15, covers required 2026-08-07)
+    [prices] BA: reusing cache (2025-07-21..2026-09-16, covers required 2026-09-02)
+    [prices] PG: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-07)
+    [prices] XOM: reusing cache (2025-07-21..2026-09-16, covers required 2026-09-06)
+    [prices] NEE: reusing cache (2025-07-21..2026-09-29, covers required 2026-09-23)
+    [prices] LIN: reusing cache (2025-07-21..2026-09-16, covers required 2026-08-09)
+    [prices] AMT: reusing cache (2025-07-21..2026-09-29, covers required 2026-09-23)
+
+[recovery] Events dropped by the 2026-09-16 run because the t0+5 trading window had not completed yet (t0 = 2026-09-14, data then ended 2026-09-16).
+           Re-fetched today (2026-09-29): t0+5 has now traded, so full car_minus1_plus1 / car_minus1_plus5 are computable from real prices.
+    RECOVERED AMZN 2026-09-14  0001104659-26-107526  t0=2026-09-14 CAR[-1,+1]=-0.0127 CAR[-1,+5]=+0.0039
+    RECOVERED NEE 2026-09-14  0001104659-26-107537  t0=2026-09-14 CAR[-1,+1]=-0.0160 CAR[-1,+5]=-0.0572
+    RECOVERED AMT 2026-09-14  0001193125-26-390605  t0=2026-09-14 CAR[-1,+1]=+0.0281 CAR[-1,+5]=-0.0130
+
+[summary]
+    companies.csv        57 rows (11 cols)
+    events.csv           240 rows (9 cols)
+    market_reactions.csv 240 rows (9 cols)
+    event window         2025-09-01 to 2026-09-17
+    yfinance info failures: none
+    events dropped for price reasons: 0
+    event_category counts: {'Financial/Earnings': 96, 'Other': 66, 'Management/Governance': 63, 'M&A/Contracts': 13, 'Legal/Regulatory': 2}
+    filing_timeliness counts: {'On-time': 227, 'Slightly Late': 13}
+    reaction_category counts: {'Negative': 61, 'Positive': 59, 'Strong Negative': 58, 'Strong Positive': 38, 'Neutral': 24}
+    late filing: GOOGL report 2026-06-05 filed 2026-06-11 (6 days) items=5.02,5.07,9.01
+    late filing: JNJ report 2026-04-23 filed 2026-04-28 (5 days) items=5.07,9.01
+    late filing: META report 2025-12-05 filed 2025-12-12 (7 days) items=8.01,9.01
+    late filing: META report 2026-04-08 filed 2026-04-14 (6 days) items=5.02
+    late filing: MSFT report 2025-09-24 filed 2025-09-30 (6 days) items=5.02
+    late filing: NEE report 2026-03-05 filed 2026-03-10 (5 days) items=5.02
+    late filing: NEE report 2026-05-21 filed 2026-05-27 (6 days) items=5.07
+    late filing: UNH report 2025-11-06 filed 2025-11-13 (7 days) items=5.03
+    late filing: UNH report 2026-02-24 filed 2026-03-02 (6 days) items=5.02
+    late filing: XOM report 2025-10-28 filed 2025-11-03 (6 days) items=5.02
+    late filing: XOM report 2025-11-07 filed 2025-11-13 (6 days) items=8.01,9.01
+    late filing: XOM report 2026-03-26 filed 2026-03-31 (5 days) items=8.01,9.01
+    late filing: XOM report 2026-04-28 filed 2026-05-04 (6 days) items=5.02
+    note: 13 ticker/date pairs have >1 filing (share the same price reaction): AMT 2025-09-16 x2, AMT 2026-06-02 x2, GOOGL 2026-06-05 x2, JPM 2025-10-14 x2, JPM 2026-01-13 x2, JPM 2026-04-14 x2, JPM 2026-06-24 x3, JPM 2026-07-14 x2, NEE 2026-05-15 x2, PG 2025-10-24 x2, PG 2026-01-22 x2, PG 2026-04-24 x2, PG 2026-07-29 x3
+    runtime: 16.6s
+
+==============================================================================
+EXTENSION RUN 2026-10-02 00:27:19 -- extend_cyber.py
+Purposive addition of 4 companies that disclosed a material cybersecurity
+incident (8-K Item 1.05) inside the event window. Existing rows untouched.
+==============================================================================
+
+[events] Pulling full 8-K history for ['FFIV', 'CPNG', 'AMGN', 'BSX'] from SEC EDGAR
+    [verify] FFIV 0001048695-25-000149: present, items=1.05,5.02,7.01, report_date=2025-10-15 -> OK
+    [verify] CPNG 0001834584-25-000196: present, items=1.05, report_date=2025-12-15 -> OK
+    [verify] AMGN 0000318154-26-000119: present, items=1.05, report_date=2026-07-29 -> OK
+    [verify] BSX 0000885725-26-000059: present, items=1.05, report_date=2026-09-07 -> OK
+    window: 2025-09-01 to 2026-09-17 (identical to the original 15 companies)
+    excluded (after window end): BSX report 2026-09-21 0000885725-26-000061 items=5.02
+    8-K/A amendments excluded by pipeline.fetch_8k_filings (form == '8-K' only), same rule as the original 15
+    [scope note] the v1/v2 mapping comparison below covers only these new filings:
+    per-ticker 8-K counts in window:
+      FFIV     9  (by CIK: {1048695: 9})
+      CPNG     9  (by CIK: {1834584: 9})
+      AMGN    10  (by CIK: {318154: 10})
+      BSX     18  (by CIK: {885725: 18})
+    [category mapping] counts under original spec map (v1) vs revised map (v2), over all in-window filings:
+      Capital/Financing        v1=  2  v2=  0  (-2)
+      Financial/Earnings       v1= 16  v2= 19  (+3)
+      M&A/Contracts            v1=  4  v2=  4  (+0)
+      Management/Governance    v1= 12  v2= 14  (+2)
+      Other                    v1= 12  v2=  5  (-7)
+      Security Incident        v1=  0  v2=  4  (+4)
+    [category mapping] 9 filings changed category; by primary item:
+      item 1.05: 4 filings  Other -> Security Incident
+      item 2.05: 1 filings  Other -> Financial/Earnings
+      item 5.07: 2 filings  Other -> Management/Governance
+      item 7.01: 2 filings  Capital/Financing -> Financial/Earnings
+
+[prices] Daily prices 2025-07-28 .. 2026-10-03 (end exclusive)
+    [prices] ^GSPC: reusing cache (2025-07-28..2026-10-01, covers required 2026-09-16)
+    ^GSPC: 298 trading days, last available 2026-10-01
+    [prices] FFIV: reusing cache (2025-07-28..2026-10-01, covers required 2026-08-05)
+    [prices] CPNG: reusing cache (2025-07-28..2026-10-01, covers required 2026-08-13)
+    [prices] AMGN: reusing cache (2025-07-28..2026-10-01, covers required 2026-08-13)
+    [prices] BSX: reusing cache (2025-07-28..2026-10-01, covers required 2026-09-16)
+
+[companies] Fetching fundamentals for ['FFIV', 'CPNG', 'AMGN', 'BSX'] (pipeline.fetch_info)
+    size_category: new companies binned on the existing 57-company quartile edges (USD) 25,046,130,688, 53,406,654,464, 273,112,940,544 -- the random sample defines the bins; purposive additions don't shift them
+    FFIV: market_cap=25,124,347,904 -> Mid
+    [classification] CPNG is not an S&P 500 constituent -> no GICS row in constituents.csv. Yahoo: sector='Consumer Cyclical', industry='Internet Retail'
+    [classification] CPNG: Yahoo classification identical to AMZN ('Consumer Cyclical' / 'Internet Retail'), whose GICS label here is 'Consumer Discretionary' / 'Broadline Retail' -> CPNG takes the same GICS pair
+    [classification] CPNG: founded_year 2010 from Yahoo profile: "was incorporated in 2010 and is headquartered in Seattle, Washington."
+    [classification] CPNG: company_name 'Coupang, Inc.' from SEC registrant record
+    CPNG: market_cap=24,805,660,672 -> Small
+    AMGN: market_cap=220,183,183,360 -> Large
+    BSX: market_cap=62,650,191,872 -> Large
+
+[extension summary]
+    file                    before   after   added
+    companies.csv               57      61      +4
+    events.csv                 240     286     +46
+    market_reactions.csv       240     286     +46
+    new event_ids: EVT0241 .. EVT0286 (EVT0001..EVT0240 unchanged)
+    new events per company: FFIV 9, CPNG 9, AMGN 10, BSX 18
+    event_category breakdown, whole dataset (before -> after):
+      Financial/Earnings         96 ->  115  (+19)
+      Management/Governance      63 ->   77  (+14)
+      Other                      66 ->   71  (+5)
+      M&A/Contracts              13 ->   17  (+4)
+      Security Incident           0 ->    4  (+4)
+      Legal/Regulatory            2 ->    2  (+0)
+    Security Incident events: 4
+      EVT0249 AMGN  report 2026-07-29 t0=2026-07-29 AR=+0.0013 CAR[-1,+1]=+0.0273 CAR[-1,+5]=+0.0417 Positive
+      EVT0268 BSX   report 2026-09-07 t0=2026-09-08 AR=-0.0532 CAR[-1,+1]=-0.0269 CAR[-1,+5]=-0.0425 Negative
+      EVT0271 CPNG  report 2025-12-15 t0=2025-12-15 AR=-0.0491 CAR[-1,+1]=-0.0918 CAR[-1,+5]=-0.1362 Strong Negative
+      EVT0279 FFIV  report 2025-10-15 t0=2025-10-15 AR=-0.0402 CAR[-1,+1]=-0.1320 CAR[-1,+5]=-0.1339 Strong Negative
+    selection_method: random_stratified=57, purposive_cyber_incident=4
+    fundamentals for the 4 new companies fetched 2026-10-02 (existing 57 were fetched 2026-09-16/29)
+    runtime: 1.9s

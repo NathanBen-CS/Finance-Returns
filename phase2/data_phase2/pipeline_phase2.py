@@ -1,10 +1,10 @@
 """
 EECS 4412 Phase 2 -- corporate events & abnormal returns at scale.
 
-Same event-study methodology as Phase 1 (data/pipeline.py): SEC 8-K filings
+Same event-study methodology as Phase 1 (phase1/data/pipeline.py): SEC 8-K filings
 joined to market-adjusted abnormal returns vs ^GSPC, CAR[-1,+1], CAR[-1,+5],
 reaction_category buckets, event_category mapping and filing_timeliness
-buckets. Those functions are IMPORTED from data/pipeline.py, not copied, so the
+buckets. Those functions are IMPORTED from phase1/data/pipeline.py, not copied, so the
 two phases cannot drift. What changes is the data-pull step:
 
   * window 2016-01-01 .. today (cut later if per-year data quality degrades)
@@ -46,8 +46,8 @@ import yfinance.shared as yf_shared  # per-ticker download errors (rate limits v
 
 ROOT = Path(__file__).resolve().parent
 RAW, PROC, CACHE = ROOT / "raw", ROOT / "processed", ROOT / "cache"
-REFERENCE = ROOT.parent / "reference"
-PHASE1 = ROOT.parent / "data"
+REFERENCE = ROOT.parent.parent / "phase1" / "reference"
+PHASE1 = ROOT.parent.parent / "phase1" / "data"
 
 # Phase 1 methodology, imported read-only. No bytecode is written so the frozen
 # Phase 1 folder is never modified.

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 DATA = Path("../data_phase2/processed")
-PHASE1 = Path("../data/processed")
+PHASE1 = Path("../../phase1/data/processed")
 OUT = Path("output")
 OUT.mkdir(exist_ok=True)
 

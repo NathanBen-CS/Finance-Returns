@@ -1,0 +1,48 @@
+{
+  "nominal_event_category": {
+    "mode": "Financial/Earnings",
+    "mode_count": 115,
+    "frequency_table": {
+      "Financial/Earnings": 115,
+      "Management/Governance": 77,
+      "Other": 71,
+      "M&A/Contracts": 17,
+      "Security Incident": 4,
+      "Legal/Regulatory": 2
+    },
+    "relative_frequency_pct": {
+      "Financial/Earnings": 40.2,
+      "Management/Governance": 26.9,
+      "Other": 24.8,
+      "M&A/Contracts": 5.9,
+      "Security Incident": 1.4,
+      "Legal/Regulatory": 0.7
+    },
+    "num_categories": 6
+  },
+  "ordinal_reaction_category": {
+    "mode": "Strong Negative",
+    "median_rank": 3.0,
+    "median_label": "Neutral",
+    "frequency_table": {
+      "Strong Negative": 73,
+      "Positive": 70,
+      "Negative": 66,
+      "Strong Positive": 50,
+      "Neutral": 27
+    }
+  },
+  "interval_report_date": {
+    "min": "2025-09-02",
+    "max": "2026-09-14",
+    "range_days": 377,
+    "median": "2026-03-23"
+  },
+  "ratio_abnormal_return": {
+    "mean_pct": -0.153,
+    "std_pct": 2.99,
+    "min_pct": -20.014,
+    "max_pct": 12.335,
+    "n": 286
+  }
+}
