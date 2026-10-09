@@ -1,0 +1,172 @@
+EECS 4412 Phase 2 build: 2026-10-09 00:11:43
+SEC User-Agent: EECS4412 Student Project nathanbenayguev9@gmail.com
+Methodology imported from C:\Users\Natha\Desktop\DataMining\data\pipeline.py (event_category map, primary_item, timeliness, reaction_category); reaction formulas mirror Phase 1 build_reactions().
+
+== Universe & company funnel ==
+  SEC ticker list (reference/company_tickers.json): 10422 tickers
+    excluded:  2461  exchange OTC
+    excluded:   638  Nasdaq warrant/unit/right of a listed common
+    excluded:   509  non-common security suffix (preferred/warrant/unit/right)
+    excluded:   466  secondary ticker of same CIK (first-listed kept)
+    excluded:   151  not in SEC exchange file (ticker changed/delisted since list date)
+    excluded:   135  SEC exchange file lists no exchange
+    excluded:    44  exchange CBOE
+    excluded:     7  exchange TXSE
+  candidate companies (one primary NYSE/Nasdaq common per CIK): 6011
+     3901  included
+     1503  SEC entityType not 'operating' (fund/foreign/other)
+      279  SIC 6770 blank-check company (SPAC)
+      186  insufficient trailing-year history (< 240 daily returns)
+       54  Yahoo quoteType ETF (not common equity)
+       40  market cap unavailable (info and Phase 1 fallbacks)
+       23  no 8-K filed in window
+       12  Yahoo industry 'Shell Companies' (SPAC not coded SIC 6770 at SEC)
+        9  non-trading: zero volume on > 50% of trailing-year sessions
+        4  stale price series (no recent closes)
+
+== Time range ==
+  requested: 2016-01-01 to 2026-10-09;  last ^GSPC session: 2026-10-08
+  per-year quality (thresholds: items tagged >= 95%, reportDate present >= 95%, events with complete price window >= 80%):
+    year      8-Ks   tagged  reportDate   priced  pass
+    2016     29803   100.0%      100.0%    96.4%  yes
+    2017     31253   100.0%      100.0%    96.3%  yes
+    2018     32570   100.0%      100.0%    97.1%  yes
+    2019     33953   100.0%      100.0%    97.5%  yes
+    2020     39228   100.0%      100.0%    97.1%  yes
+    2021     41261   100.0%      100.0%    97.3%  yes
+    2022     40140   100.0%      100.0%    98.6%  yes
+    2023     42769   100.0%      100.0%    98.7%  yes
+    2024     44563   100.0%      100.0%    99.1%  yes
+    2025     47652   100.0%      100.0%    99.4%  yes
+    2026     36984   100.0%      100.0%    98.8%  yes
+  -> every year passes; full requested range achieved: 2016-01-01 to 2026-10-09
+
+== Final counts ==
+  companies.csv             3900
+  events.csv              411685
+  market_reactions.csv    411685
+  (1 otherwise-eligible companies removed: none of their 8-Ks had a complete price window)
+
+== Sampling design ==
+  selection_method = 'stratified_universe_census': every company that passed verification is included,
+  i.e. a 100% sampling fraction in every sector x size x volatility stratum.
+  plain stratified (census) companies: 3900;  purposive top-up: 0 (none needed:
+  tiers are quartiles of the final pool, so no tier can be starved).
+
+== Stratification dimensions ==
+  volatility_tier = quartiles of trailing 1-year realized volatility (annualized std of daily
+  returns, last 252 ^GSPC sessions to 2026-10-08, >= 240 valid returns required).
+  Tier edges (annualized): 2.3%, 33.0%, 52.1%, 80.7%, 10621.8%
+
+  volatility_tier (companies)
+    Low                           976  25.0%
+    Medium                        975  25.0%
+    High                          974  25.0%
+    Very High                     975  25.0%
+
+  volatility_tier (events)
+    Low                        123080  29.9%
+    Medium                     107965  26.2%
+    High                        90930  22.1%
+    Very High                   89710  21.8%
+  size_category edges (USD): 32,432, 165,316,032, 1,099,682,176, 5,776,806,400, 5,565,400,481,792
+
+  size_category (companies)
+    Small                         976  25.0%
+    Mid                           975  25.0%
+    Large                         974  25.0%
+    Mega-cap                      975  25.0%
+  market cap source: {'info': 3896, 'derived': 4}
+
+  sector (Yahoo classification; companies)
+    Healthcare                    860  22.1%
+    Financial Services            626  16.1%
+    Technology                    568  14.6%
+    Industrials                   509  13.1%
+    Consumer Cyclical             387  9.9%
+    Real Estate                   223  5.7%
+    Energy                        170  4.4%
+    Consumer Defensive            164  4.2%
+    Communication Services        155  4.0%
+    Basic Materials               148  3.8%
+    Utilities                      80  2.1%
+    (blank)                        10  0.3%
+
+  size_category x volatility_tier (companies):
+                      Low     Medium       High  Very High
+    Small              40         81        230        625
+    Mid               232        209        318        216
+    Large             269        345        270         90
+    Mega-cap          435        340        156         44
+  sector x volatility_tier cells with < 10 companies: 2 -- Utilities/Medium=9, Utilities/High=2
+
+  Phase 1 companies on Phase 2's volatility scale (61 of 61 matched): Low 38, Medium 17, High 5, Very High 1
+
+== Filing timeliness (not curated; Phase 1 calendar-day buckets) ==
+
+  filing_timeliness (events)
+    On-time                    362577  88.1%
+    Slightly Late               46773  11.4%
+    Late                         2335  0.6%
+  Slightly Late + Late share: 11.9%
+  caveat: 86.9% of 'Slightly Late' events were filed within 4 business days (weekends; holidays not counted), i.e. on time under SEC's rule.
+  negative lags (reportDate after filingDate, kept as filed): 1
+  non-On-time share by size_category: Small 16.7%, Mid 11.7%, Large 10.4%, Mega-cap 9.7%
+
+  event_category (events)
+    Financial/Earnings         182787  44.4%
+    Management/Governance       97608  23.7%
+    Other                       62678  15.2%
+    M&A/Contracts               59453  14.4%
+    Legal/Regulatory             7421  1.8%
+    Capital/Financing            1691  0.4%
+    Security Incident              47  0.0%
+
+  reaction_category (events)
+    Strong Negative            109992  26.7%
+    Strong Positive            103125  25.0%
+    Negative                    80024  19.4%
+    Positive                    77133  18.7%
+    Neutral                     41411  10.1%
+
+== Dropped events ==
+  duplicate accession numbers (co-registrant filings) removed: 242
+  events before effective start 2016-01-01: 0
+       7393  missing price in event window
+        685  missing volume in baseline window
+        413  t0+5 not yet available
+  (per-event list: raw/dropped_events.csv; per-company outcomes: raw/company_funnel.csv)
+  volume_change_pct blank (zero baseline volume): 2506
+
+== Methodology check vs Phase 1 ==
+  recomputed 286 of 286 Phase 1 events with Phase 2 code: max |diff| in returns/CARs = 6.45e-07; reaction_category identical for 100.0%
+
+== Data-quality caveats for modeling ==
+  1. Extreme returns kept as reported by Yahoo: 1759 events have |daily_return| or a CAR above 100%
+       |daily_return| > 50%:   1374   |CAR[-1,+5]| > 50%:   6245
+       |daily_return| > 100%:    371   |CAR[-1,+5]| > 100%:   1570
+       |daily_return| > 300%:     82   |CAR[-1,+5]| > 300%:    241
+     Some are genuine micro-cap moves; some are likely unadjusted reverse splits (e.g. NFE shows a
+     one-day +5,060% close on 2026-08-04, outside any event window). Not removed or winsorized here;
+     listed in raw/extreme_return_events.csv. Use winsorizing/robust methods or a Small-cap sensitivity check.
+  2. Survivorship bias: the universe is TODAY's SEC ticker list, so companies delisted, acquired or
+     bankrupt between 2016 and now are absent. Early years over-represent eventual survivors.
+  3. Tiers are measured once, as of 2026-10-08 (market cap at fetch, volatility over the trailing year),
+     not at each event date. A 2016 event carries the company's 2026 tier.
+  4. sector/sub_industry are Yahoo's (Morningstar-style) taxonomy, not GICS (Phase 1 used GICS).
+     sic_code/sic_description are SEC's own classification, included alongside.
+  5. filing_timeliness keeps Phase 1's calendar-day buckets; most 'Slightly Late' filings were on time
+     under SEC's 4-business-day rule (see timeliness section). Real late filing is rarer than it looks.
+  6. 17868 ticker/date pairs have more than one 8-K (37077 events); they share one price reaction, so they are not independent.
+  7. ticker = the company's CURRENT ticker; events are pulled by CIK, so ticker changes are handled,
+     but price history before a ticker change may be missing on Yahoo (those events are dropped above).
+  8. Known residual: FACT (FACT II Acquisition Corp.) is a SPAC that neither screen caught (SEC SIC
+     3728, no Yahoo industry). 8-K/A amendments are excluded, as in Phase 1.
+
+== Effort ==
+  sec        6947 data.sec.gov requests   0.39 h  {'http_200': 6947, 'network_errors': 8}
+  prices       63 yfinance download calls (batched; ~5937 ticker histories, i.e. roughly that many HTTP requests)   0.16 h
+  info       4016 Yahoo quoteSummary requests   0.79 h  {}
+  stage time 1.34 h total (sec and prices ran in parallel, so wall-clock was less)
+  SEC rate cap 5 req/s (SEC limit 10), 4 threads, back-off on 403/429/5xx
+  build   103s
