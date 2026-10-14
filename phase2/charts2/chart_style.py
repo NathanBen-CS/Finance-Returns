@@ -13,6 +13,12 @@ OUT.mkdir(exist_ok=True)
 BLUE, ORANGE, AQUA, YELLOW, MAGENTA, GREEN = \
     "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"
 BLUE_RAMP = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
+RED_RAMP = ["#fbe0df", "#f5b5b4", "#ee8988", "#e34948", "#c23433", "#962524", "#6b1817"]
+
+# Company "style": calm = Low/Medium volatility tier, volatile = High/Very High (the pool median split).
+# blue/red validated as a pair under --pairs all (CVD dE 21.6, normal-vision dE 32.3).
+CALM, VOLATILE = "#2a78d6", "#e34948"
+CALM_LIGHT, VOLATILE_LIGHT = "#9ec5f4", "#f5b5b4"
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK2 = "#52514e"
@@ -50,8 +56,12 @@ def usd(x, _=None):
     return f"${x:,.0f}"
 
 
-def save(fig, name):
-    fig.tight_layout()
-    fig.savefig(OUT / name, dpi=160)
+def save(fig, name, folder="shared", tight=True):
+    """Write output/<folder>/<name>. 'shared' = all-company charts; other folders = one company group."""
+    if tight:
+        fig.tight_layout()
+    path = OUT / folder
+    path.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path / name, dpi=160)
     plt.close(fig)
-    print("  wrote", name)
+    print(f"  wrote {folder}/{name}")
