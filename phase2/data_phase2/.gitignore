@@ -1,2 +1,4 @@
 cache/
 processed/full_dataset*
+processed/*.pkl
+__pycache__/
