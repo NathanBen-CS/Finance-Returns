@@ -90,7 +90,10 @@ BATCH_SIZE = 64
 EPOCHS = 15
 LEARNING_RATE = 1e-3
 REACTION_LOSS_WEIGHT = 0.3 # weight of the secondary task (reaction_category) next to the CAR loss
-SEED = 2                   # fixes the starting weights and shuffle order, so two runs that differ
+TASK = "direction"        # "regression": predict the CAR[-1,+1] value itself (Huber loss)
+                           # "direction":  predict only whether CAR[-1,+1] > 0 -- the same single
+                           #               output becomes a logit, trained with BCEWithLogitsLoss
+SEED = 0                   # fixes the starting weights and shuffle order, so two runs that differ
                            # only in a setting (e.g. USE_TIME_CYCLES) differ only because of that
                            # setting. For an ablation, repeat each side with 2-3 seeds (0, 1, 2):
                            # if the gap between settings is smaller than the gap between seeds,

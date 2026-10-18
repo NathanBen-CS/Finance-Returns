@@ -77,10 +77,10 @@ reactions.csv ─┘     event, numbers only)        number tables)      history
 
 | File | Lines | Job |
 |---|---|---|
-| `tier0_config.py` | 97 | All settings in one place: paths, the leakage rule, training knobs |
+| `tier0_config.py` | 100 | All settings in one place: paths, the leakage rule, training knobs |
 | `tier0_prepare_data.py` | 130 | Reads the 3 CSVs, turns every event into rows of numbers, saves them |
 | `tier0_model.py` | 69 | The neural network: a small Transformer encoder plus two output heads |
-| `tier0_train.py` | 207 | Builds each event's history, feeds batches to the model, trains, evaluates |
+| `tier0_train.py` | 234 | Builds each event's history, feeds batches to the model, trains, evaluates |
 
 ### The one idea everything is built around: no peeking at the answer
 
@@ -947,7 +947,7 @@ returns. Setting this to True removes `volatility_tier` and
 `trailing_volatility_1y` from the inputs. Run it both ways: if the results barely
 change, the look-ahead isn't what's driving them.
 
-### Lines 86–97: training settings
+### Lines 86–100: training settings
 
 ```python
 TRAIN_END = "2025-01-01"   # events before this date train the model
@@ -980,6 +980,23 @@ REACTION_LOSS_WEIGHT = 0.3
 
 The total loss is `CAR loss + 0.3 × reaction-class loss`. CAR is the main task;
 the class task is a helper and counts for less.
+
+```python
+TASK = "regression"
+```
+
+**What the main task is.** Two choices, everything else identical:
+
+- `"regression"`: predict the CAR1 **value** itself (e.g. +0.0148), trained with
+  Huber loss. MAE and R² measure it.
+- `"direction"`: predict only **up or down** (is CAR1 above 0?). The model's single
+  CAR output is then a **logit**: a score where above 0 means "up" and below 0
+  means "down". It's trained with `BCEWithLogitsLoss` (binary cross-entropy: like
+  the 5-class cross-entropy in Part 3, but for one yes/no question). Accuracy and
+  per-side recall measure it.
+
+The model itself doesn't change: it outputs one number either way. Only the
+target, the loss and the evaluation change (Part 8).
 
 ```python
 SEED = 0
@@ -1590,7 +1607,8 @@ self.class_head = nn.Linear(d_model, n_classes)
 
 Both read the same 64-number combined vector:
 
-- `car_head`: 64 → **1 number**, the predicted CAR1.
+- `car_head`: 64 → **1 number**: the predicted CAR1, or, with `TASK = "direction"`,
+  a logit for "up" (above 0 = up).
 - `class_head`: 64 → **5 numbers**, a score (logit) for each reaction class.
   Softmax would turn these into probabilities; `CrossEntropyLoss` does that
   internally (Part 3).
@@ -2123,18 +2141,20 @@ def get_device():
 - If the GPU worked, the function has already returned `"cuda"`. Otherwise it
   falls through to the last line and returns the CPU.
 
-### Lines 127–143: `run_epoch`, one pass over the data
+### Lines 127–146: `run_epoch`, one pass over the data
 
 ```python
-def run_epoch(model, t, rows, optimizer=None):
+def run_epoch(model, t, rows, pos_weight, optimizer=None):
     training = optimizer is not None
     model.train(training)
-    car_loss, class_loss = nn.SmoothL1Loss(), nn.CrossEntropyLoss()
+    car_loss = nn.SmoothL1Loss() if cfg.TASK == "regression" else nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    class_loss = nn.CrossEntropyLoss()
     total = 0.0
     with torch.set_grad_enabled(training):
         for history, lengths, current, car, cls in batches(t, rows, shuffle=training):
             car_pred, logits = model(history, lengths, current)
-            loss = car_loss(car_pred, car) + cfg.REACTION_LOSS_WEIGHT * class_loss(logits, cls)
+            target = car if cfg.TASK == "regression" else (car > 0).float()
+            loss = car_loss(car_pred, target) + cfg.REACTION_LOSS_WEIGHT * class_loss(logits, cls)
             if training:
                 optimizer.zero_grad()
                 loss.backward()
@@ -2150,7 +2170,16 @@ whether you hand it an optimizer.
   False for validation. `optimizer=None` in the signature means the argument is
   optional.
 - `model.train(training)`: dropout on for training, off for validation.
-- `car_loss, class_loss = ...`: create the two loss functions (Part 3).
+- `car_loss = ... if ... else ...`: an inline if (Part 1). Huber loss for
+  regression; `BCEWithLogitsLoss(pos_weight=pos_weight)` for direction. `pos_weight`
+  multiplies the loss on every **up** event. It's computed once in `main`
+  (Lines 185–188) and passed in, so training and validation use the same
+  weighting. `class_loss` is the 5-class
+  cross-entropy either way (Part 3).
+- `target = ...`: what the CAR output is compared against. For regression, the CAR
+  itself. For direction, `(car > 0).float()`: `car > 0` gives True/False per event,
+  and `.float()` turns that into 1.0 (up) or 0.0 (down). `BCEWithLogitsLoss` then
+  pushes the logit above 0 for up events and below 0 for down events.
 - `total = 0.0`: a running total of the loss.
 - `with torch.set_grad_enabled(training):` record gradients only when training.
 - `for ... in batches(t, rows, shuffle=training):` `batches` hands out one batch
@@ -2170,7 +2199,7 @@ whether you hand it an optimizer.
 - `return total / len(rows)`: the average loss per example over the whole
   epoch.
 
-### Lines 145–154: `predict`
+### Lines 149–157: `predict`
 
 ```python
 @torch.no_grad()
@@ -2194,22 +2223,27 @@ def predict(model, t, rows):
   (along the last dimension, the 5 classes).
 - `np.concatenate(...)`: join the per-batch arrays into one long array.
 
-### Lines 156–163: start of `main`
+### Lines 160–168: start of `main`
 
 ```python
+assert cfg.TASK in ("regression", "direction"), f"unknown TASK {cfg.TASK!r}"
 torch.manual_seed(cfg.SEED)
 np.random.seed(cfg.SEED)
 with open(cfg.EVENTS_PKL, "rb") as f:
     d = pickle.load(f)
-print(f"Settings: USE_TIME_CYCLES=..., DROP_LOOKAHEAD_FEATURES=..., CAUSAL_READOUT=..., SEED=...")
+print(f"Settings: USE_TIME_CYCLES=..., DROP_LOOKAHEAD_FEATURES=..., CAUSAL_READOUT=..., TASK=..., SEED=...")
 ```
 
+- The `assert` stops immediately if `TASK` is misspelled. Without it, a typo like
+  `"regresion"` would quietly run direction mode, because the code checks
+  "regression or not". `{cfg.TASK!r}` prints the value with quotes so the typo is
+  easy to spot.
 - Fix both random-number generators so the run is repeatable (Part 5).
 - Load the 141 MB data dict from the prepare step.
 - Print the settings, so every results log records which version of the
   experiment produced it.
 
-### Lines 165–169: the time-based split
+### Lines 170–174: the time-based split
 
 ```python
 dates = d["event_date"]
@@ -2231,7 +2265,7 @@ That's correct and intended. In real life you'd know a company's past when
 predicting its future. What matters is that the *events being scored* in the test
 are later than anything the model **trained on**.
 
-### Lines 171–173: the device, and the data onto it
+### Lines 176–178: the device, and the data onto it
 
 ```python
 device = get_device()
@@ -2245,7 +2279,7 @@ on_device = lambda rows: torch.as_tensor(rows, device=device)
   into a tensor on the device. It's needed because indexing GPU tables needs GPU
   row numbers. The NumPy versions (`train_rows` etc.) are kept for the final scoring.
 
-### Lines 174–178: build the model and optimizer
+### Lines 179–183: build the model and optimizer
 
 ```python
 n_history = len(history_columns(d))
@@ -2262,12 +2296,41 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.LEARNING_RATE)
 - `torch.optim.AdamW(model.parameters(), lr=...)`: give the optimizer the list of
   every learnable weight, and the step size.
 
-### Lines 180–183: the training loop
+### Lines 185–188: the class weight for the direction task
+
+```python
+train_car = d["target_car1"][train_rows]
+pos_weight = torch.tensor((train_car <= 0).sum() / (train_car > 0).sum(), device=device)
+```
+
+- `train_car`: the CAR of every **training** event (it's also used for the
+  baselines later).
+- `(train_car <= 0).sum()`: how many training events went down (True counts as
+  1). `(train_car > 0).sum()`: how many went up. `pos_weight` = down ÷ up.
+- `torch.tensor(..., device=device)`: the loss runs on the GPU, so the weight must
+  live there too.
+
+**What it does.** If up events were rarer, a model could score well by mostly
+saying "down". `pos_weight` makes each up event count **more** in the loss by
+exactly the imbalance, so getting the rare side wrong costs as much in total as
+getting the common side wrong.
+
+**Rules it follows.** It's counted on the **training split only**; using
+validation or test labels would leak information from the future. And it's
+computed **once, before training**, so it never changes between epochs or
+batches.
+
+**In your data it barely matters.** The training split has 161,991 up and 165,763
+down events, so `pos_weight` = **1.023**. The weighting is there for correctness,
+but don't expect it to change results much. If a trained model still collapses to
+one side, imbalance isn't the reason.
+
+### Lines 190–193: the training loop
 
 ```python
 for epoch in range(1, cfg.EPOCHS + 1):
-    train_loss = run_epoch(model, t, on_device(train_rows), optimizer)
-    val_loss = run_epoch(model, t, on_device(val_rows))
+    train_loss = run_epoch(model, t, on_device(train_rows), pos_weight, optimizer)
+    val_loss = run_epoch(model, t, on_device(val_rows), pos_weight)
     print(f"epoch {epoch:2d}/{cfg.EPOCHS}  train loss {train_loss:.4f}  validation loss {val_loss:.4f}")
 ```
 
@@ -2279,13 +2342,14 @@ for epoch in range(1, cfg.EPOCHS + 1):
 loss keeps falling while the validation loss starts **rising**, the model is
 memorising the training data (overfitting).
 
-### Lines 186–189: test predictions and the baselines
+### Lines 196–200: test predictions and the baselines
 
 ```python
 car_pred, class_pred = predict(model, t, on_device(test_rows))
 car_true, class_true = d["target_car1"][test_rows], d["target_class"][test_rows]
 baseline = d["target_car1"][train_rows].mean()
 majority = np.bincount(d["target_class"][train_rows]).argmax()
+majority_direction = 1 if (train_car > 0).sum() >= (train_car < 0).sum() else -1
 ```
 
 - Predict on the test period; get the true answers for the same rows (same order,
@@ -2295,8 +2359,19 @@ majority = np.bincount(d["target_class"][train_rows]).argmax()
 - **`majority`**: `np.bincount` counts how often each class number (0–4) appears
   in training, and `.argmax()` picks the most common. Always guessing that class
   is the classification bar to beat.
+- **`majority_direction`**: was "up" or "down" more common in training? (`train_car`
+  was defined at Lines 185–188.) `(train_car > 0).sum()` counts the positive CARs (True counts as 1), and likewise the
+  negatives. It's +1 if positives are at least as common, otherwise -1. Always
+  guessing that direction is the up/down bar to beat.
 
-### Lines 191–192: R² against the baseline
+  Why not just use the sign of `baseline`, the average? Because a few huge moves
+  can drag the average one way while most events go the other. In your training
+  data the average is **positive** (+0.58%), but **more events are negative**
+  (50.6% vs 49.4%). Guessing "up" scores only 0.465 on the test period, while
+  guessing the commoner "down" scores 0.535. Using the average's sign would have
+  made the bar 7 points too easy.
+
+### Lines 204–205: R² against the baseline
 
 ```python
 def r2_vs_baseline(mask):
@@ -2314,7 +2389,13 @@ R² vs baseline = 1 - (model's squared errors) / (baseline's squared errors)
 In return prediction, even a small positive number, measured honestly on later
 data, is a real result. `mask` picks which test events to score.
 
-### Lines 194–207: the results
+### Lines 202–230: the results
+
+The printout depends on `TASK`: `if cfg.TASK == "regression":` prints the
+regression results, and `else:` prints the direction results. The reaction
+accuracy line comes after both, so it's always printed.
+
+**Regression results.**
 
 ```python
 everything = np.ones(len(car_true), bool)
@@ -2337,15 +2418,49 @@ The prints show:
   and `np.mean` of True/False is the fraction that's True.
 - **direction accuracy**: ignores size and only asks "did the prediction land on the
   same side of zero as the truth?" `np.sign` turns each number into -1, 0 or +1,
-  and comparing signs gives True/False per event. The baseline always predicts
-  the training average, so it always guesses that average's sign (for example,
-  always "down"). Its score is just the share of test events on that side, often
-  close to 50%, which makes this a **harder** bar to clear than the class
-  baseline.
+  and comparing signs gives True/False per event. The baseline always guesses
+  `majority_direction`, the direction that was commoner in training (here
+  "down"). Its score is just the share of test events on that side, about 53.5%
+  here, which makes this a **harder** bar to clear than the class baseline.
+
+**Direction results** (`TASK = "direction"`).
+
+```python
+up_true, up_pred = car_true > 0, car_pred > 0
+print(... np.mean(up_pred == up_true) ... np.mean((majority_direction > 0) == up_true) ...)
+recall_up, recall_down = np.mean(up_pred[up_true]), np.mean(~up_pred[~up_true])
+print(f"  recall               up events {recall_up:.3f}   down events {recall_down:.3f}")
+print(f"  balanced accuracy    model {(recall_up + recall_down) / 2:.3f}   baseline 0.500")
+```
+
+- `up_true`: True where the event really went up. `up_pred`: True where the
+  model's logit is above 0, meaning it predicted up (above 0 is the same as a
+  probability above 50%).
+- **direction accuracy**: the fraction where `up_pred` matches `up_true`. The
+  baseline always guesses the commoner training direction:
+  `majority_direction > 0` is a single True ("always up") or False ("always
+  down"), compared against every event.
+- **recall, up events**: `up_pred[up_true]` keeps only the events that really
+  went up (a True/False mask used as an index, Part 2) and asks what fraction the
+  model called up.
+- **recall, down events**: `~up_pred[~up_true]` does the same for the events that
+  really went down. `~` means "not", so this is the fraction the model called down.
+- **balanced accuracy**: the average of the two recalls, so up and down events
+  count **equally** however many of each there are. Its baseline is always
+  **0.500**: always guessing one side gives recalls of 1 and 0, and (1 + 0) / 2 =
+  0.5. Unlike plain accuracy, it can't be inflated by favouring the commoner side.
+
+**Why recall matters.** Accuracy alone can hide a lazy model. A model that always
+says "down" scores the same accuracy as the baseline (about 53.5%) while learning
+nothing; recall exposes it as **0.000 on up events and 1.000 on down events**. (An
+untrained model produced exactly that pattern in testing.) A model that has
+learned something shows **both** recalls well above 0, and accuracy above the
+baseline.
+
 - Format codes: `:.5f` = 5 decimals; `:+.4f` = 4 decimals with a sign;
   `:.1%` = a percentage.
 
-### Lines 210–211
+### Lines 233–234
 
 ```python
 if __name__ == "__main__":
@@ -2533,6 +2648,7 @@ with a minus sign but which equals 0 exactly.
 | `USE_TIME_CYCLES` | `True` | Does cyclical timing (weekly/quarterly) help? |
 | `DROP_LOOKAHEAD_FEATURES` | `True` (then re-run **prepare**) | Are results leaning on the 2026 snapshot? |
 | `CAUSAL_READOUT` | `True` | Summary token over everything, or read the last event with a causal mask? |
+| `TASK` | `"direction"` | Is up/down easier to predict than the size of the move? |
 | `MAX_HISTORY_LEN` | 32, 64, 256 | How much history matters? |
 | `SEED` | 0, 1, 2 | How much is noise? Run every experiment with several seeds |
 
@@ -2553,6 +2669,11 @@ TEST RESULTS (model vs. naive baseline)
   direction accuracy   model 0.xxx   baseline 0.xxx
 ```
 
+With `TASK = "direction"`, the CAR MAE and R² lines are replaced by direction
+accuracy, `recall  up events 0.xxx  down events 0.xxx` and
+`balanced accuracy  model 0.xxx  baseline 0.500`. Above 0.500 balanced accuracy
+means the model tells up from down better than chance.
+
 - Model MAE **lower** than baseline MAE: it misses by less than "always guess the
   average" does.
 - R² vs baseline **above 0**: it explains some of the variation. Watch the
@@ -2561,7 +2682,7 @@ TEST RESULTS (model vs. naive baseline)
 - Reaction accuracy **above** the baseline: it beats "always guess the commonest
   class".
 - Direction accuracy **above** the baseline: it calls up/down better than "always
-  guess the average's direction". Even a few points above ~50% is meaningful here.
+  guess the commoner direction". Even a few points above ~53.5% is meaningful here.
 - All at or below baseline: an honest, reportable result. This feature set
   doesn't predict reactions better than chance.
 
@@ -2605,6 +2726,11 @@ TEST RESULTS (model vs. naive baseline)
 | **logits** | Raw class scores before softmax |
 | **loss** | One number for how wrong the predictions are |
 | **Huber / SmoothL1 loss** | Squared error for small misses, straight-line for big ones |
+| **logit** | A raw score before squashing into a probability; for one yes/no question, above 0 means "yes" |
+| **binary cross-entropy (BCEWithLogitsLoss)** | Cross-entropy for a single yes/no question, applied directly to a logit |
+| **balanced accuracy** | The average of the per-side recalls; 0.5 = no better than guessing one side |
+| **class weight (pos_weight)** | Makes each example of one class count more in the loss, to offset imbalance |
+| **recall** | Of the events that really were X, the fraction the model called X |
 | **cross-entropy** | -log(probability given to the true class) |
 | **gradient** | For each weight, which way and how strongly it should change to reduce the loss |
 | **backward pass** | `loss.backward()`: computing all the gradients |

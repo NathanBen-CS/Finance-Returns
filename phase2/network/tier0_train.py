@@ -124,16 +124,20 @@ def get_device():
     return torch.device("cpu")
 
 
-def run_epoch(model, t, rows, optimizer=None):
+def run_epoch(model, t, rows, pos_weight, optimizer=None):
     """One pass over the events in rows; trains if an optimizer is given. Returns the average loss."""
     training = optimizer is not None
     model.train(training)
-    car_loss, class_loss = nn.SmoothL1Loss(), nn.CrossEntropyLoss()  # Huber: robust to fat-tailed CARs
+    # regression: Huber loss (robust to fat-tailed CARs); direction: binary cross-entropy on a logit,
+    # with up events weighted by pos_weight so neither direction dominates
+    car_loss = nn.SmoothL1Loss() if cfg.TASK == "regression" else nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    class_loss = nn.CrossEntropyLoss()
     total = 0.0
     with torch.set_grad_enabled(training):
         for history, lengths, current, car, cls in batches(t, rows, shuffle=training):
             car_pred, logits = model(history, lengths, current)
-            loss = car_loss(car_pred, car) + cfg.REACTION_LOSS_WEIGHT * class_loss(logits, cls)
+            target = car if cfg.TASK == "regression" else (car > 0).float()   # direction: 1 = up, 0 = down
+            loss = car_loss(car_pred, target) + cfg.REACTION_LOSS_WEIGHT * class_loss(logits, cls)
             if training:
                 optimizer.zero_grad()
                 loss.backward()
@@ -154,12 +158,13 @@ def predict(model, t, rows):
 
 
 def main():
+    assert cfg.TASK in ("regression", "direction"), f"unknown TASK {cfg.TASK!r}"
     torch.manual_seed(cfg.SEED)          # same starting weights and shuffle order every run
     np.random.seed(cfg.SEED)
     with open(cfg.EVENTS_PKL, "rb") as f:
         d = pickle.load(f)
     print(f"Settings: USE_TIME_CYCLES={cfg.USE_TIME_CYCLES}, DROP_LOOKAHEAD_FEATURES={cfg.DROP_LOOKAHEAD_FEATURES}, "
-          f"CAUSAL_READOUT={cfg.CAUSAL_READOUT}, "
+          f"CAUSAL_READOUT={cfg.CAUSAL_READOUT}, TASK={cfg.TASK}, "
           f"SEED={cfg.SEED}")
 
     dates = d["event_date"]
@@ -177,9 +182,14 @@ def main():
                        causal_readout=cfg.CAUSAL_READOUT).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.LEARNING_RATE)
 
+    # direction task: weight each up event by (down events / up events), counted on the TRAINING
+    # split only and fixed before training starts (ignored when TASK = "regression")
+    train_car = d["target_car1"][train_rows]
+    pos_weight = torch.tensor((train_car <= 0).sum() / (train_car > 0).sum(), device=device)
+
     for epoch in range(1, cfg.EPOCHS + 1):
-        train_loss = run_epoch(model, t, on_device(train_rows), optimizer)
-        val_loss = run_epoch(model, t, on_device(val_rows))
+        train_loss = run_epoch(model, t, on_device(train_rows), pos_weight, optimizer)
+        val_loss = run_epoch(model, t, on_device(val_rows), pos_weight)
         print(f"epoch {epoch:2d}/{cfg.EPOCHS}  train loss {train_loss:.4f}  validation loss {val_loss:.4f}")
 
     # ---------------- is it better than guessing? (test set = the most recent, never-seen period)
@@ -187,23 +197,36 @@ def main():
     car_true, class_true = d["target_car1"][test_rows], d["target_class"][test_rows]
     baseline = d["target_car1"][train_rows].mean()                 # "always predict the average"
     majority = np.bincount(d["target_class"][train_rows]).argmax()  # "always predict the commonest class"
+    majority_direction = 1 if (train_car > 0).sum() >= (train_car < 0).sum() else -1  # "always predict the commoner direction"
 
-    def r2_vs_baseline(mask):
-        return 1 - ((car_true[mask] - car_pred[mask]) ** 2).sum() / ((car_true[mask] - baseline) ** 2).sum()
+    print(f"\nTEST RESULTS (model vs. naive baseline), TASK={cfg.TASK}")
+    if cfg.TASK == "regression":
+        def r2_vs_baseline(mask):
+            return 1 - ((car_true[mask] - car_pred[mask]) ** 2).sum() / ((car_true[mask] - baseline) ** 2).sum()
 
-    everything = np.ones(len(car_true), bool)
-    ordinary = np.abs(car_true) <= 0.5      # the >50% tail includes data glitches and dominates squared error
-    print("\nTEST RESULTS (model vs. naive baseline)")
-    print(f"  CAR MAE              model {np.abs(car_true - car_pred).mean():.5f}   "
-          f"baseline {np.abs(car_true - baseline).mean():.5f}")
-    print(f"  R^2 vs baseline      all events {r2_vs_baseline(everything):+.4f}   "
-          f"|CAR| <= 50% ({ordinary.mean():.1%} of events) {r2_vs_baseline(ordinary):+.4f}")
+        everything = np.ones(len(car_true), bool)
+        ordinary = np.abs(car_true) <= 0.5  # the >50% tail includes data glitches and dominates squared error
+        print(f"  CAR MAE              model {np.abs(car_true - car_pred).mean():.5f}   "
+              f"baseline {np.abs(car_true - baseline).mean():.5f}")
+        print(f"  R^2 vs baseline      all events {r2_vs_baseline(everything):+.4f}   "
+              f"|CAR| <= 50% ({ordinary.mean():.1%} of events) {r2_vs_baseline(ordinary):+.4f}")
+        # direction only: did the predicted CAR land on the same side of zero as the real one?
+        # (the baseline always guesses whichever direction was commoner in training)
+        print(f"  direction accuracy   model {np.mean(np.sign(car_pred) == np.sign(car_true)):.3f}   "
+              f"baseline {np.mean(majority_direction == np.sign(car_true)):.3f}")
+    else:
+        # car_pred holds logits: above 0 means "predicted up" (probability above 0.5)
+        up_true, up_pred = car_true > 0, car_pred > 0
+        print(f"  direction accuracy   model {np.mean(up_pred == up_true):.3f}   "
+              f"baseline {np.mean((majority_direction > 0) == up_true):.3f}")
+        # recall per side: a model that always guesses one direction scores 1.000 on one, 0.000 on the other
+        recall_up, recall_down = np.mean(up_pred[up_true]), np.mean(~up_pred[~up_true])
+        print(f"  recall               up events {recall_up:.3f}   down events {recall_down:.3f}")
+        # balanced accuracy: the two recalls averaged, so both directions count equally.
+        # Always guessing one side gives (1 + 0) / 2 = 0.500 whatever the class balance.
+        print(f"  balanced accuracy    model {(recall_up + recall_down) / 2:.3f}   baseline 0.500")
     print(f"  reaction accuracy    model {np.mean(class_pred == class_true):.3f}   "
           f"baseline {np.mean(majority == class_true):.3f}")
-    # direction only: did the predicted CAR land on the same side of zero as the real one?
-    # (the baseline always guesses the sign of the training average)
-    print(f"  direction accuracy   model {np.mean(np.sign(car_pred) == np.sign(car_true)):.3f}   "
-          f"baseline {np.mean(np.sign(baseline) == np.sign(car_true)):.3f}")
     print("Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.")
 
 
