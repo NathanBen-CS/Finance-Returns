@@ -2,3 +2,4 @@ cache/
 processed/full_dataset*
 processed/*.pkl
 __pycache__/
+processed/tier0_events.csv

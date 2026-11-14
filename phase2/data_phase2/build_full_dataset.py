@@ -101,7 +101,7 @@ def main():
                else None) for c in cols}
     styled = [(i, fmt[c]) for i, c in enumerate(cols) if fmt[c]]
     for n, row in enumerate(df.itertuples(index=False, name=None), 1):
-        vals = [None if (isinstance(v, float) and math.isnan(v)) else v for v in row]
+        vals = [None if (v is pd.NA or (isinstance(v, float) and math.isnan(v))) else v for v in row]
         for i, f in styled:
             if vals[i] is not None:
                 cell = WriteOnlyCell(ws, value=vals[i])
@@ -126,6 +126,8 @@ def main():
                            "values are unchanged from the CSVs"),
         ("Blank cells", "Values the sources do not have (e.g. volume_change_pct with zero baseline volume, "
                         "missing revenue/employees); nothing was filled in"),
+        ("price_data_unreliable", "True when a suspected bad price date falls on the event's trading days -1..+5; "
+                                  "other values are unchanged. See flag_price_splices.py"),
         ("Built by", "phase2/data_phase2/build_full_dataset.py"),
     ]
     bold = Font(name=FONT, size=10, bold=True)

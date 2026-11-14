@@ -1,0 +1,23 @@
+encoded_column,PC1,PC2,PC3
+size_category,0.424983,0.067330,0.060662
+market_cap,0.435610,0.090320,0.077052
+revenue_ttm,0.411839,0.030961,-0.085145
+employees,0.420947,0.083905,-0.148022
+trailing_volatility_1y,-0.182330,-0.038269,-0.339460
+sector=Basic Materials,0.028613,-0.128455,-0.056894
+sector=Communication Services,-0.020670,0.062268,-0.125692
+sector=Consumer Cyclical,0.056917,-0.019135,-0.203408
+sector=Consumer Defensive,0.017057,-0.027068,-0.098643
+sector=Energy,0.037212,-0.184096,0.055223
+sector=Financial Services,0.006917,0.072739,0.450352
+sector=Healthcare,-0.140684,0.184503,0.363382
+sector=Industrials,0.049987,-0.180755,-0.309086
+sector=Real Estate,0.015394,-0.262637,0.202105
+sector=Technology,-0.018014,0.252115,-0.393732
+sector=Utilities,0.051327,-0.062621,0.064607
+exchange=ASE,-0.104908,-0.088336,0.022142
+exchange=NCM,-0.331201,-0.100032,-0.196554
+exchange=NGM,-0.090275,0.088099,0.313838
+exchange=NMS,0.082773,0.640513,-0.056625
+exchange=NYQ,0.286013,-0.527428,0.024967
+exchange=PNK,-0.019531,-0.001799,0.030151

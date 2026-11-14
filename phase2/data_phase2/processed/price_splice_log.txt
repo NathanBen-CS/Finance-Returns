@@ -1,0 +1,10 @@
+Settings: |log return| > 1.5 (x4.48), reversal within 5 sessions, offset error <= 10%, non-positive closes flagged: True
+Price files scanned: 5,935 of 5,936 cached tickers (3,900 in companies.csv)
+Round-trip companies: 48 in the cache, 24 in companies.csv
+Non-positive-close companies: 5 in the cache, 4 in companies.csv
+Flagged companies, either kind: 51 in the cache, 27 in companies.csv, 16 with a flagged event
+Events: 411,685; price_data_unreliable = True: 245 (round trip 27, non-positive close 218, both 0)
+Flag inside CAR[-1,+1] itself: 236; only in days +2..+5: 9
+Tier 0 split of flagged events: {'train': 227, 'test': 18}
+Flagged events in the Phase 1 sample: 0
+One-way suspects, not flagged: 56 moves at 47 companies (41 match a split), touching 44 events; in the Phase 1 sample: 0

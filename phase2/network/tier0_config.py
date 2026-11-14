@@ -93,8 +93,20 @@ REACTION_LOSS_WEIGHT = 0.3 # weight of the secondary task (reaction_category) ne
 TASK = "direction"        # "regression": predict the CAR[-1,+1] value itself (Huber loss)
                            # "direction":  predict only whether CAR[-1,+1] > 0 -- the same single
                            #               output becomes a logit, trained with BCEWithLogitsLoss
-SEED = 0                   # fixes the starting weights and shuffle order, so two runs that differ
+CLASS_WEIGHTED_LOSS = True # direction task only: weight each up event by (down events / up events) in the
+                           # loss, so neither direction dominates; False = unweighted BCEWithLogitsLoss
+SEED = 0                  # fixes the starting weights and shuffle order, so two runs that differ
                            # only in a setting (e.g. USE_TIME_CYCLES) differ only because of that
                            # setting. For an ablation, repeat each side with 2-3 seeds (0, 1, 2):
                            # if the gap between settings is smaller than the gap between seeds,
                            # it is noise.
+
+# ---------------------------------------------------------------- overrides (used by tier0_sweep.py)
+# If the environment variable TIER0_OVERRIDE_JSON names a JSON file, its keys replace the
+# settings above, e.g. {"TASK": "regression", "SEED": 1}. Only existing settings can be
+# overridden, so a misspelt key stops the run instead of being ignored.
+import json, os
+if os.environ.get("TIER0_OVERRIDE_JSON"):
+    _overrides = json.loads(Path(os.environ["TIER0_OVERRIDE_JSON"]).read_text(encoding="utf-8"))
+    assert set(_overrides) <= set(globals()), f"unknown settings in TIER0_OVERRIDE_JSON: {sorted(set(_overrides) - set(globals()))}"
+    globals().update(_overrides)

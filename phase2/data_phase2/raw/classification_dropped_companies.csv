@@ -1,0 +1,198 @@
+ticker,company_name,size_category,events_dropped,missing_columns
+ACR,ACRES Commercial Realty Corp.,Small,120,employees
+ACRE,Ares Commercial Real Estate Corp,Mid,116,employees
+AFCG,Advanced Flower Capital Inc.,Small,70,employees
+AHT,ASHFORD HOSPITALITY TRUST INC,Small,477,employees
+AIFA,"All In FutureTech Alliance, Inc.",Small,124,employees
+ALIT,"Alight, Inc. / Delaware",Mid,81,employees
+ALOY,REALLOYS INC.,Mid,62,employees
+AMCI,AMC Robotics Corp,Small,28,employees
+AMIX,"Autonomix Medical, Inc.",Small,30,employees
+AMSF,AMERISAFE INC,Mid,69,employees
+ANAB,"ANAPTYSBIO, INC",Large,115,employees
+AOMR,"Angel Oak Mortgage REIT, Inc.",Mid,117,employees
+APUS,"Apimeds Pharmaceuticals US, Inc.",Small,21,employees
+ARCC,ARES CAPITAL CORP,Mega-cap,180,employees
+ARI,"Apollo Commercial Real Estate Finance, Inc.",Mid,100,employees
+ARR,"Armour Residential REIT, Inc.",Large,435,employees
+ASBP,"Aspire-Lakewood Holdings, Inc.",Small,56,employees
+ASTC,ASTROTECH Corp,Small,141,employees
+AVA,AVISTA CORP,Large,170,employees
+AZO,AUTOZONE INC,Mega-cap,123,employees
+BBDC,"Barings BDC, Inc.",Mid,100,employees
+BCIC,BCP Investment Corp,Small,105,employees
+BCSF,"Bain Capital Specialty Finance, Inc.",Mid,125,employees
+BCTX,BriaCell Therapeutics Corp.,Small,65,employees
+BGMS,"Bio Green Med Solution, Inc.",Small,174,employees
+BHM,"Bluerock Homes Trust, Inc.",Small,63,employees
+BHR,Braemar Hotels & Resorts Inc.,Small,447,employees
+BRUN,Boost Run Inc.,Mid,10,employees
+BSM,"Black Stone Minerals, L.P.",Large,91,employees
+BXMT,"BLACKSTONE MORTGAGE TRUST, INC.",Large,98,employees
+BXSL,Blackstone Secured Lending Fund,Large,64,employees
+CAPL,CrossAmerica Partners LP,Mid,144,employees
+CCAP,"Crescent Capital BDC, Inc.",Mid,70,employees
+CGBD,"Carlyle Secured Lending, Inc.",Mid,135,employees
+CION,CION Investment Corp,Mid,90,employees
+CKX,"CKX LANDS, INC.",Small,40,employees
+CLRO,CLEARONE INC,Small,117,employees
+CMMB,Chemomab Therapeutics Ltd.,Small,46,employees
+CMTG,"Claros Mortgage Trust, Inc.",Mid,61,employees
+CQP,"Cheniere Energy Partners, L.P.",Mega-cap,174,employees
+CRSP,CRISPR Therapeutics AG,Large,133,employees
+CRT,CROSS TIMBERS ROYALTY TRUST,Small,134,employees
+CTOR,"CITIUS ONCOLOGY, INC.",Small,48,employees
+CTVA,"Corteva, Inc.",Mega-cap,79,employees
+CVM,CEL SCI CORP,Small,120,employees
+CWEN,"Clearway Energy, Inc.",Mega-cap,155,employees
+DGICA,DONEGAL GROUP INC,Mid,155,employees
+DHC,DIVERSIFIED HEALTHCARE TRUST,Large,122,employees
+DIN,"Dine Brands Global, Inc.",Mid,148,employees
+DKL,"Delek Logistics Partners, LP",Large,198,employees
+DXR,DAXOR CORP,Small,33,employees
+EARN,Ellington Credit Co,Small,169,employees
+ELME,Elme Communities,Small,107,employees
+ENJ,"ENTERGY NEW ORLEANS, LLC",Small,37,"sector,employees"
+EPD,ENTERPRISE PRODUCTS PARTNERS L.P.,Mega-cap,127,employees
+EQS,"EQUUS TOTAL RETURN, INC.",Small,87,employees
+ESLA,"Estrella Immunopharma, Inc.",Small,58,employees
+FABC,"Fabric.AI, Inc.",Small,133,employees
+FAC,Factorial Energy Inc.,Mid,12,employees
+FACT,FACT II Acquisition Corp.,Mid,3,"sector,employees"
+FCFS,"FirstCash Holdings, Inc.",Mega-cap,152,employees
+FDS,FACTSET RESEARCH SYSTEMS INC,Mega-cap,104,employees
+FDUS,FIDUS INVESTMENT Corp,Mid,94,employees
+FISV,FISERV INC,Mega-cap,139,"sector,employees"
+FLYX,FLYEXCLUSIVE INC.,Small,34,employees
+FRAF,FRANKLIN FINANCIAL SERVICES CORP /PA/,Mid,201,employees
+FRMM,FORUM MARKETS Inc,Small,203,employees
+FSK,FS KKR Capital Corp,Large,248,employees
+FWONA,Liberty Media Corp,Mega-cap,261,employees
+GBDC,"GOLUB CAPITAL BDC, Inc.",Large,257,employees
+GCV,GABELLI CONVERTIBLE & INCOME SECURITIES FUND INC,Small,1,employees
+GECC,Great Elm Capital Corp.,Small,124,employees
+GHI,Greystone Housing Impact Investors LP,Small,304,employees
+GLAD,GLADSTONE CAPITAL CORP,Mid,144,employees
+GLSI,"Greenwich LifeSciences, Inc.",Mid,28,employees
+GOOD,GLADSTONE COMMERCIAL CORP,Mid,114,employees
+GPJA,GEORGIA POWER CO,Mid,14,"sector,employees"
+GRDX,GridAI Technologies Corp.,Small,204,employees
+GSBD,"Goldman Sachs BDC, Inc.",Mid,164,employees
+HDRN,"Hadron Energy, Inc.",Small,19,employees
+HESM,Hess Midstream LP,Mega-cap,65,employees
+HOS,"HORNBECK OFFSHORE SERVICES, INC.",Large,140,employees
+HRZN,Horizon Technology Finance Corp,Mid,206,employees
+ICMB,"Investcorp Credit Management BDC, Inc.",Small,63,employees
+ILPT,Industrial Logistics Properties Trust,Mid,77,employees
+IVR,Invesco Mortgage Capital Inc.,Mid,147,employees
+JBL,JABIL INC,Mega-cap,101,employees
+JSPR,"Jasper Therapeutics, Inc.",Small,83,employees
+KBDC,"Kayne Anderson BDC, Inc.",Mid,29,employees
+KEEL,Keel Infrastructure Corp.,Large,9,employees
+KIDZ,KIDZ AI Inc.,Small,38,employees
+KPLT,"Katapult Holdings, Inc.",Mid,88,employees
+KREF,KKR Real Estate Finance Trust Inc.,Mid,82,employees
+KRP,"Kimbell Royalty Partners, LP",Large,121,employees
+LAND,GLADSTONE LAND Corp,Mid,125,employees
+LB,LandBridge Co LLC,Mega-cap,25,employees
+LFT,"Lument Finance Trust, Inc.",Small,117,employees
+LHAI,Linkhome Holdings Inc.,Small,7,employees
+LIEN,"Chicago Atlantic BDC, Inc.",Mid,53,employees
+LION,Lionsgate Studios Corp.,Large,15,"sector,employees"
+LOPE,"Grand Canyon Education, Inc.",Large,87,employees
+LRHC,La Rosa Holdings Corp.,Small,91,employees
+MARPS,MARINE PETROLEUM TRUST,Small,47,employees
+MDRR,"Medalist Diversified, Inc.",Small,146,employees
+MEDS,"DataMeds AI, Inc.",Small,52,employees
+MFIC,MidCap Financial Investment Corp,Mid,102,employees
+MHLA,"Maiden Holdings, Ltd.",Mid,115,"sector,employees"
+MIRA,"MIRA PHARMACEUTICALS, INC.",Small,71,employees
+MITT,"TPG Mortgage Investment Trust, Inc.",Mid,109,employees
+MKZR,"MacKenzie Realty Capital, Inc.",Small,46,employees
+MLCI,Mount Logan Capital Inc.,Small,17,employees
+MMLP,MARTIN MIDSTREAM PARTNERS L.P.,Small,84,employees
+MOVE,"Corvex, Inc.",Mid,54,employees
+MPLX,MPLX LP,Mega-cap,131,employees
+MRLN,"Merlin, Inc.",Small,13,employees
+MRP,"Millrose Properties, Inc.",Large,30,employees
+MSDL,Morgan Stanley Direct Lending Fund,Large,45,employees
+MSIF,"MSC INCOME FUND, INC.",Mid,31,employees
+MTR,MESA ROYALTY TRUST/TX,Small,129,employees
+MU,MICRON TECHNOLOGY INC,Mega-cap,170,employees
+NCDL,Nuveen Churchill Direct Lending Corp.,Mid,32,employees
+NECB,"NorthEast Community Bancorp, Inc./MD/",Mid,45,employees
+NEN,NEW ENGLAND REALTY ASSOCIATES LIMITED PARTNERSHIP,Mid,25,employees
+NEOV,NeoVolta Inc.,Small,21,employees
+NEXM,NexMetals Mining Corp.,Small,58,employees
+NIQ,NIQ Global Intelligence plc,Large,7,"sector,employees"
+NLOP,Net Lease Office Properties,Small,17,employees
+NMAD,"NOMAD POWER SOLUTIONS, INC.",Small,112,employees
+NMFC,New Mountain Finance Corp,Mid,139,employees
+NREF,"NexPoint Real Estate Finance, Inc.",Mid,77,employees
+NTRB,NutriBand Inc.,Small,40,employees
+NUV,NUVEEN MUNICIPAL VALUE FUND INC,Large,3,employees
+NXDT,NEXPOINT DIVERSIFIED REAL ESTATE TRUST,Mid,32,employees
+NXST,"NEXSTAR MEDIA GROUP, INC.",Large,182,employees
+NYC,American Strategic Investment Co.,Small,162,employees
+OBDC,Blue Owl Capital Corp,Large,154,employees
+OCSL,Oaktree Specialty Lending Corp,Mid,120,employees
+ORC,"Orchid Island Capital, Inc.",Mid,195,employees
+ORMP,ORAMED PHARMACEUTICALS INC.,Mid,119,employees
+OTF,Blue Owl Technology Finance Corp.,Large,27,employees
+OXSQ,Oxford Square Capital Corp.,Small,89,employees
+OZ,"Belpointe PREP, LLC",Small,29,employees
+PAGP,PLAINS GP HOLDINGS LP,Mega-cap,158,employees
+PBAM,"Private Bancorp of America, Inc.",Mid,5,employees
+PBHC,"Pathfinder Bancorp, Inc.",Small,148,employees
+PBT,PERMIAN BASIN ROYALTY TRUST,Large,149,employees
+PENG,"Penguin Solutions, Inc.",Large,112,employees
+PFLT,PennantPark Floating Rate Capital Ltd.,Mid,287,employees
+PFSA,"Profusa, Inc.",Small,40,employees
+PINE,"Alpine Income Property Trust, Inc.",Mid,64,employees
+PNNT,PENNANTPARK INVESTMENT CORP,Mid,202,employees
+PRT,PermRock Royalty Trust,Small,109,employees
+PSBD,Palmer Square Capital BDC Inc.,Mid,66,employees
+PSEC,PROSPECT CAPITAL CORP,Mid,161,employees
+PUSA,Powerus Corp,Mid,16,employees
+PVL,Permianville Royalty Trust,Small,143,employees
+PW,Power REIT,Small,113,employees
+RAIN,"Rain Enhancement Technologies Holdco, Inc.",Small,16,employees
+RAND,RAND CAPITAL CORP,Small,54,employees
+REBN,"Reborn Coffee, Inc.",Small,51,employees
+REFI,"Chicago Atlantic Real Estate Finance, Inc.",Mid,37,employees
+RMCO,Royalty Management Holding Corp,Small,37,employees
+RPT,Rithm Property Trust Inc.,Small,95,employees
+RTB,"RTB Digital, Inc.",Small,131,employees
+RWAY,Runway Growth Finance Corp.,Mid,80,employees
+SAR,SARATOGA INVESTMENT CORP.,Mid,85,employees
+SBR,SABINE ROYALTY TRUST,Mid,137,employees
+SCM,Stellus Capital Investment Corp,Mid,45,employees
+SDOT,Sadot Group Inc.,Small,157,employees
+SEV,Aptera Motors Corp,Small,18,"sector,employees"
+SEVN,Seven Hills Realty Trust,Small,58,employees
+SI,"SHOULDER INNOVATIONS, INC.",Mid,12,"sector,employees"
+SJM,J M SMUCKER Co,Mega-cap,113,employees
+SLRC,SLR Investment Corp.,Mid,94,employees
+STHO,Star Holdings,Small,26,employees
+SUNS,"Sunrise Realty Trust, Inc.",Small,22,employees
+SVC,Service Properties Trust,Mid,152,employees
+TCI,TRANSCONTINENTAL REALTY INVESTORS INC,Mid,74,employees
+TCPC,BlackRock TCP Capital Corp.,Mid,119,employees
+TELO,"Telomir Pharmaceuticals, Inc.",Small,61,employees
+TPVG,TriplePoint Venture Growth BDC Corp.,Mid,97,employees
+TRON,Tron Inc.,Mid,60,employees
+TRTX,"TPG RE Finance Trust, Inc.",Mid,94,employees
+TSLX,"Sixth Street Specialty Lending, Inc.",Large,116,employees
+TVE,Tennessee Valley Authority,Small,97,"sector,employees"
+UHT,UNIVERSAL HEALTH REALTY INCOME TRUST,Mid,71,employees
+UROY,Uranium Royalty Corp.,Large,2,employees
+UVSP,UNIVEST FINANCIAL Corp,Large,152,employees
+VLGEA,VILLAGE SUPER MARKET INC,Mid,62,employees
+VMRK,VIVMARK RESIDENTIAL,Mega-cap,113,employees
+VNOM,"Viper Energy, Inc.",Mega-cap,14,employees
+WHF,"WhiteHorse Finance, Inc.",Small,167,employees
+WLKP,Westlake Chemical Partners LP,Mid,70,employees
+WTBA,WEST BANCORPORATION INC,Mid,74,employees
+XIFR,"XPLR Infrastructure, LP",Mid,133,employees
+XLAB,Exascale Labs Holdings Inc.,Small,4,employees
+ZSQR,Z Squared Inc.,Mid,62,employees

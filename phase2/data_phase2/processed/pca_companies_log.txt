@@ -1,0 +1,119 @@
+EECS 4412 Phase 2, Task 1: PCA on the Companies entity
+======================================================================
+Loaded processed/companies.csv: 3,900 companies, 15 columns (Events and Market_Reactions have 9 each, so Companies has the most dimensions).
+
+DIMENSIONS
+  size_category (ordinal); market_cap, revenue_ttm, employees, trailing_volatility_1y (ratio);
+  sector, exchange (nominal). ticker is kept as the row label only.
+
+STEP 1: MISSING VALUES (reported first; incomplete companies are dropped, nothing is imputed)
+  size_category               0 missing
+  market_cap                  0 missing
+  revenue_ttm               290 missing
+  employees                 197 missing
+  trailing_volatility_1y      0 missing
+  sector                     10 missing
+  exchange                    0 missing
+  FISV is confirmed incomplete: missing revenue_ttm,employees,sector.
+  Dropped 454 companies with at least one blank.
+
+  PRICE EXCLUSIONS (spliced-looking prices inside the 1-year volatility window)
+  11 have bad source data (mixed split-adjusted and unadjusted prices):
+    NFE   1-for-50 split on 2026-09-14
+    BURU  1-for-40 split on 2026-09-02
+    OPTT  1-for-30 split on 2026-09-14
+    GTBP  1-for-25 split on 2026-09-08
+    BRTX  1-for-20 split on 2026-09-08
+    MTNB  1-for-15 split on 2026-09-28
+    NXXT  1-for-10 split on 2026-09-14
+    VWAV  1-for-20 split on 2026-09-22
+    BTLN  1-for-8 split on 2026-09-28
+    WHLR  1-for-9 split on 2026-09-22
+    LRHC  1-for-6 split on 2026-09-08; split record and jump sizes only, Yahoo's current prices do not cover the dates
+  2 match the pattern but their prices look real; excluded as instructed:
+    CPHI  no split on record; press reports match the close ($8.10, +790%) and volume (93.6M) on 2026-07-21
+    PLAG  no split on record; prices match Yahoo's current data, 213.7M shares traded on 2026-08-11; no press report found
+  3 of the 13 already had a blank (GTBP, LRHC, MTNB), so this removes 10 more.
+  All of them are listed in raw/pca_dropped_companies.csv.
+
+  COMPANY COUNT USED: 3,436 of 3,900 (88.1%)
+  Dropped share by size:   Small 23.8%, Mid 14.3%, Large 6.9%, Mega-cap 2.7%
+  Dropped share by sector, highest three: Healthcare 27.3%, Real Estate 20.2%, Basic Materials 14.9%
+
+STEP 2: ENCODING
+  size_category: Small=1, Mid=2, Large=3, Mega-cap=4
+  market_cap, revenue_ttm, employees: log1p, using Tier 0's rule (negative values become 0 first).
+  This changes 13 companies with negative revenue_ttm; 16 more report exactly 0.
+  trailing_volatility_1y: as stored, not logged.
+  sector: one-hot, 11 columns | exchange: one-hot, 6 columns
+  7 dimensions become 22 encoded columns; loadings are reported across those 22.
+
+STEP 3: STANDARDISATION
+  Every encoded column, one-hot columns included: z = (value - mean) / population standard deviation.
+  Each column therefore has variance 1 and total variance equals the number of columns.
+
+STEP 4: PCA (scikit-learn PCA, svd_solver='full')
+  component  eigenvalue  explained  cumulative
+  PC1           4.3613     19.82%      19.82%
+  PC2           1.6967      7.71%      27.53%
+  PC3           1.2861      5.84%      33.37%
+  PC4           1.2296      5.59%      38.96%
+  PC5           1.1862      5.39%      44.35%
+  PC6           1.1510      5.23%      49.58%
+  PC7           1.1319      5.14%      54.72%
+  PC8           1.1022      5.01%      59.73%
+  PC9           1.0652      4.84%      64.57%
+  PC10          1.0489      4.77%      69.34%
+  PC11          1.0470      4.76%      74.10%
+  PC12          1.0302      4.68%      78.78%
+  PC13          1.0115      4.60%      83.37%
+  PC14          0.9955      4.52%      87.90%
+  PC15          0.8287      3.77%      91.66%
+  PC16          0.8009      3.64%      95.30%
+  PC17          0.4705      2.14%      97.44%
+  PC18          0.3371      1.53%      98.97%
+  PC19          0.1610      0.73%      99.71%
+  PC20          0.0649      0.29%     100.00%
+  PC21          0.0000      0.00%     100.00%
+  PC22          0.0000      0.00%     100.00%
+  Kept PC1-PC3: 33.37% of the variance.
+  The last 2 components are zero because each one-hot group sums to 1, which removes one
+  degree of freedom per group: 22 columns, rank 20.
+
+  Largest loadings (a loading here = the unit-length eigenvector weight):
+  PC1: market_cap +0.44, size_category +0.42, employees +0.42, revenue_ttm +0.41, exchange=NCM -0.33
+       most extreme: IPDN 9.5, INHD 9.4, DUKR 7.8 | top 1% of companies hold 8% of its squared scores
+  PC2: exchange=NMS +0.64, exchange=NYQ -0.53, sector=Real Estate -0.26, sector=Technology +0.25, sector=Healthcare +0.18
+       most extreme: AAPL 2.8, MSFT 2.8, GPMT 2.8 | top 1% of companies hold 4% of its squared scores
+  PC3: sector=Financial Services +0.45, sector=Technology -0.39, sector=Healthcare +0.36, trailing_volatility_1y -0.34, exchange=NGM +0.31
+       most extreme: IPDN 12.5, INHD 11.4, DUKR 8.3 | top 1% of companies hold 13% of its squared scores
+
+SEPARATION IN THE PC1-PC2 PLANE (silhouette, -1 to +1; near 0 = groups overlap)
+  size_category +0.146 | sector -0.128 -> size_category separates better; neither forms clean clusters.
+
+SENSITIVITY CHECKS (reported only; the deliverable above follows the requested preprocessing)
+  keeping CPHI and PLAG: 22 columns, top 3 explain 33.38%; top 1% hold 8% of PC1's squared scores.
+  also excluding IPDN, DUKR, OPAD: 22 columns, top 3 explain 33.65%; top 1% hold 8% of PC1's squared scores.
+  log1p on trailing_volatility_1y too: 22 columns, top 3 explain 34.94%; top 1% hold 7% of PC1's squared scores.
+  without log1p: 22 columns, top 3 explain 27.71%; top 1% hold 35% of PC1's squared scores.
+  negative revenue kept negative (signed log): 22 columns, top 3 explain 32.86%; top 1% hold 8% of PC1's squared scores.
+  without the single PNK company (WORX): 21 columns, top 3 explain 34.95%; top 1% hold 8% of PC1's squared scores.
+
+DIFFERENCES FROM PHASE 1'S 61-COMPANY ASSUMPTIONS
+   1. Scale: 61 companies became 3,900 in the table and 3,436 here. All 61 Phase 1 tickers are in the table; 58 survive the drop. Lost: AZO, FISV, MU.
+   2. founded_year exists in Phase 1 only and is not used.
+   3. size_category changed meaning: quartiles of 61 S&P large caps in Phase 1, quartiles of the full census now. All 61 Phase 1 companies are Mega-cap on the new scale; only 14 keep their old tier.
+   4. market_cap range: $8,672,975,872 to $4,851,251,544,064 in Phase 1, $32,432 to $5,565,400,481,792 now.
+   5. Skew is far heavier: market_cap 3.4 in Phase 1, 22.9 now. log1p brings it to -0.2.
+   6. sector is Yahoo's taxonomy now, GICS in Phase 1 (e.g. 'Healthcare' vs 'Health Care'), so labels do not join directly.
+   7. trailing_volatility_1y does not exist in Phase 1. After the exclusions it still reaches 3781.1% (IPDN), with skew 23.5. IPDN, DUKR, OPAD show a similar one-way jump and remain in the data.
+   8. exchange has 6 codes now (ASE, NCM, NGM, NMS, NYQ, PNK), 2 in Phase 1. PNK is one company (WORX), so its z-scored column is one extreme value.
+   9. Blanks: revenue_ttm 1 and employees 1 in Phase 1; 290 and 197 now. Phase 1 has employees for AZO and MU, but those older values were not copied across, so every company follows one rule.
+  10. Zero or negative revenue_ttm: 0 in Phase 1, 33 now. Among the companies used, 13 negative values become 0 under the Tier 0 log rule.
+  11. Dropping is not random: small companies and Healthcare are dropped most, so the 3,436 lean larger than the full census.
+  12. With 22 unit-variance columns, 17 of them one-hot, three components can only reach a low share (33.4%); this reflects the encoding as well as the data.
+
+WROTE
+  processed/pca_companies_scores.csv (3,436 rows), pca_companies_explained_variance.csv, pca_companies_loadings.csv
+  processed/220227286.xlsx: T1_PCA_Companies, T1_PCA_Variance, T1_PCA_Loadings, T1_PCA_Notes
+  raw/pca_dropped_companies.csv (464 rows)

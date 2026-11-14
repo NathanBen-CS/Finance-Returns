@@ -1,0 +1,171 @@
+EECS 4412 Phase 2, Task 2: classification of reaction_category
+======================================================================
+Loaded processed/full_dataset.csv: 411,685 events, 3,900 companies, event-level rows.
+
+STEP 1: ROWS
+  price_data_unreliable == True: 245 rows dropped, 411,440 left.
+  Blanks in the features, on the remaining rows:
+    sector                   457 (0.11%)
+    exchange                   0 (0.00%)
+    size_category              0 (0.00%)
+    market_cap                 0 (0.00%)
+    employees             19,402 (4.72%)
+    filing_timeliness          0 (0.00%)
+    event_category             0 (0.00%)
+  Rows with a blank feature: 19,402 from 197 companies. Dropped, as in Task 1; nothing is imputed.
+  Dropped share by size: Small 7.5%, Mid 7.1%, Large 3.1%, Mega-cap 2.0%
+  Dropped share by class: Strong Negative 3.8%, Negative 5.7%, Neutral 6.2%, Positive 5.6%, Strong Positive 3.7%
+  ROWS USED: 392,038 events from 3,703 companies (95.23% of all events).
+
+STEP 2: LABEL
+  reaction_category, unchanged from Phase 1: CAR[-1,+1] < -3% Strong Negative; < -0.5% Negative;
+  <= +0.5% Neutral; <= +3% Positive; otherwise Strong Positive.
+  Check against the stored CAR: 7 rows differ, all exactly at a boundary after rounding to 6 decimals. Labels are kept as stored.
+  Class distribution:
+    Strong Negative       105,701 (26.96%)
+    Negative               75,442 (19.24%)
+    Neutral                 38,837 (9.91%)
+    Positive               72,813 (18.57%)
+    Strong Positive        99,245 (25.32%)
+
+STEP 3: FEATURES
+  sector (nominal, one-hot): industries may differ in news sensitivity
+  exchange (nominal, one-hot): rough proxy for visibility and quality tier
+  size_category (ordinal: Small=1, Mid=2, Large=3, Mega-cap=4, as in Phase 1 and Task 1)
+  market_cap (ratio, log1p then z-score): continuous size signal
+  employees (ratio, log1p then z-score): size and maturity proxy
+  filing_timeliness (ordinal in the Phase 1 spec: On-time=1, Slightly Late=2, Late=3): compliance signal
+  event_category (nominal, one-hot): the kind of news, built from the 8-K item codes
+  filing_day_of_week (nominal, one-hot): day name of filing_date; the only new column
+  Skew of market_cap: 21.17 raw, -0.25 after log1p, so log1p is used. No value is <= 0.
+  Skew of employees: 19.63 raw, -0.14 after log1p, so log1p is used. No value is <= 0.
+
+  Columns not used:
+    trailing_volatility_1y  excluded on purpose: a per-company snapshot, and the standard deviation of returns is tied to CAR size by formula
+    volatility_tier         quartiles of trailing_volatility_1y, so the same problem
+    car_minus1_plus1        defines the label
+    car_minus1_plus5        contains the label's window
+    abnormal_return         price-derived, inside the label's window
+    daily_return            price-derived, inside the label's window
+    market_return           price-derived, inside the label's window
+    volume_change_pct       measured on day 0, so not known before the reaction
+    price_data_unreliable   used as the row filter; it is False on every kept row
+    revenue_ttm             not requested; a third size measure, also a snapshot, 290 companies blank
+    sub_industry            already rejected in Task 1: it nests inside sector and adds about 140 one-hot columns
+    item_codes              event_category is built from it; a list of codes, not one clean category
+    num_items_disclosed     not requested; counts the codes in item_codes
+    report_date             a date, not a feature; it anchors the label's window
+    event_seq               position in the company's history, not a concept requested
+    event_id                row label only
+    ticker                  row label only
+    trading_date            row label only
+    filing_date             row label only
+    accession_number        identifier
+    company_name            identifier
+    cik                     identifier
+    sic_code                identifier-like, overlaps sector
+    sic_description         identifier-like, overlaps sector
+    selection_method        zero variance
+  Nothing was excluded for being more than 50% blank (the highest is employees, 4.72%). selection_method is the only zero-variance column.
+
+STEP 4: SPLIT AND ENCODING
+  Stratified on reaction_category, 80/20, random_state=42: 313,630 train, 78,408 test.
+    Strong Negative    train  84,561  test  21,140
+    Negative           train  60,353  test  15,089
+    Neutral            train  31,070  test   7,767
+    Positive           train  58,250  test  14,563
+    Strong Positive    train  79,396  test  19,849
+  8 features become 33 encoded columns. The z-score of the two log columns is fitted on the training rows only.
+  size_category and filing_timeliness stay as ordered numbers and the one-hot columns stay 0/1.
+  A tree ignores feature scale, and GaussianNB fits a separate spread per column, so standardising barely changes either model.
+
+STEP 5: DECISION TREE DEPTH
+  Always guessing the largest class (Strong Negative) scores 26.96%.
+  max_depth  leaves  train acc  test acc    gap  5-fold acc  test macro AUC
+  None       76,108     53.01%    28.43% 24.57%      27.33%          0.5590
+  5              32     31.18%    31.12%  0.06%      31.02%          0.6159
+  10            894     32.64%    31.48%  1.16%      31.41%          0.6271
+  Kept max_depth=10: the best 5-fold accuracy on the training rows, so the test rows played no part in the choice.
+
+STEP 6: RESULTS ON THE TEST ROWS
+
+  Decision Tree (max_depth=10)
+    accuracy 31.48% (train 32.64%, largest-class baseline 26.96%) | macro F1 0.2550 | weighted F1 0.2949 | macro AUC 0.6271
+    class              precision   recall      F1     AUC  support  share predicted
+    Strong Negative        0.370    0.453   0.408   0.644   21,140            33.0%
+    Negative               0.264    0.347   0.300   0.608   15,089            25.3%
+    Neutral                0.196    0.004   0.007   0.641    7,767             0.2%
+    Positive               0.271    0.194   0.226   0.624   14,563            13.3%
+    Strong Positive        0.317    0.353   0.334   0.618   19,849            28.2%
+    confusion matrix (rows true, columns predicted, in the class order above):
+      Strong Negative      9,581   3,284      29   1,677   6,569
+      Negative             3,698   5,237      35   2,616   3,503
+      Neutral              1,557   2,975      29   1,548   1,658
+      Positive             3,289   5,060      36   2,827   3,351
+      Strong Positive      7,758   3,290      19   1,773   7,009
+
+  Gaussian Naive Bayes
+    accuracy 29.17% (train 29.01%, largest-class baseline 26.96%) | macro F1 0.2330 | weighted F1 0.2581 | macro AUC 0.6048
+    class              precision   recall      F1     AUC  support  share predicted
+    Strong Negative        0.363    0.463   0.407   0.625   21,140            34.4%
+    Negative               0.241    0.005   0.010   0.586   15,089             0.4%
+    Neutral                0.160    0.129   0.143   0.618    7,767             8.0%
+    Positive               0.240    0.439   0.311   0.603   14,563            34.0%
+    Strong Positive        0.308    0.283   0.295   0.592   19,849            23.2%
+    confusion matrix (rows true, columns predicted, in the class order above):
+      Strong Negative      9,778      80     938   5,058   5,286
+      Negative             3,944      75   1,745   6,355   2,970
+      Neutral              1,705      38   1,003   3,553   1,468
+      Positive             3,526      61   1,693   6,400   2,883
+      Strong Positive      8,005      57     874   5,294   5,619
+
+STEP 7: COMPARISON
+  F1: tree wins Strong Negative, Negative, Strong Positive; Naive Bayes wins Neutral, Positive.
+  AUC: tree wins Strong Negative, Negative, Neutral, Positive, Strong Positive; Naive Bayes wins none.
+  Side of zero, among rows where neither truth nor prediction is Neutral: tree 52.13%, Naive Bayes 52.11%; 48.71% of these true classes are up.
+  Largest tree importances: log_market_cap 0.354, log_employees 0.153, event_category=Financial/Earnings 0.142, sector=Financial Services 0.102, sector=Real Estate 0.060, sector=Healthcare 0.028
+
+  The tree wins overall: accuracy 31.48% vs 29.17%, macro F1 0.255 vs 0.233, macro AUC 0.627 vs 0.605. Both sit only a little above the 26.96% largest-class baseline and the 0.5 AUC of guessing.
+  F1: tree wins Strong Negative, Negative, Strong Positive; Naive Bayes wins Neutral, Positive.
+  AUC: tree wins Strong Negative, Negative, Neutral, Positive, Strong Positive; Naive Bayes wins none.
+  Naive Bayes wins F1 on Neutral and Positive because it predicts them far more often (8.0% and 34.0% of test rows, against 0.2% and 13.3% for the tree), not because it ranks them better: the tree has the higher AUC on both. In return it almost never predicts Negative (0.4% of rows, recall 0.005).
+  Why the tree does better: the effects combine. An earnings filing lifts the chance of a Strong reaction from 30.6% to 51.5% at Mega-cap companies but only from 66.8% to 69.8% at Small ones. A tree can split on that combination. Naive Bayes multiplies one independent effect per column, so it cannot. This reading is supported by what did not help Naive Bayes when tested (see the sensitivity table): giving it one size column instead of three, or discrete inputs instead of bell curves, barely changes its AUC.
+  What both models learn is how large a reaction is, not which way it goes. The share of Strong reactions runs from 40.1% at Mega-cap to 67.9% at Small, and from 31.1% in Utilities to 65.2% in Healthcare. The side of zero is close to a coin flip: when both truth and prediction have a side, the tree is right 52.1% of the time and Naive Bayes 52.1%, and 51.3% of true non-Neutral rows are down. This is why each model's most common mistake on the two Strong classes is the opposite Strong class.
+
+STEP 8: CHECKS ON WHAT COULD FLATTER THESE SCORES (reported only; the results above use the requested split and features)
+  check                                                          tree acc tree AUC  NB acc  NB AUC baseline
+  Results above (stratified 80/20)                                 31.48%   0.6271  29.17%  0.6048   26.96%
+  No company in both train and test                                31.31%   0.6186  28.83%  0.6041   27.05%
+  No company-day in both train and test                            31.24%   0.6252  24.84%  0.6011   26.79%
+  Train on the earliest 80%, test from 2025-01-13                  33.07%   0.6189  30.91%  0.5991   32.25%
+  Without filing_timeliness and filing_day_of_week                 31.58%   0.6283  29.12%  0.6033   26.96%
+  Without size_category, market_cap, employees                     30.35%   0.6130  28.75%  0.5993   26.96%
+  Without event_category                                           30.58%   0.6138  28.58%  0.5960   26.96%
+  Without the one-way price suspects                               31.48%   0.6271  29.18%  0.6048   26.96%
+  Without the rare columns exchange=PNK and event_category=Security Incident   31.48%   0.6271  29.77%  0.6058   26.96%
+  market_cap as the only size column                               31.23%   0.6231  29.29%  0.6036   26.96%
+  Five other random splits (random_state 0-4), lowest to highest: tree accuracy 0.3129-0.3155, tree AUC 0.6243-0.6266, Naive Bayes accuracy 0.2797-0.2902, Naive Bayes AUC 0.6039-0.6052
+  Naive Bayes accuracy on those splits without the rare columns: 0.2948-0.2986
+  CategoricalNB on the same features, with market_cap and employees in deciles: accuracy 29.62%, macro AUC 0.6069
+  max_depth=None on unseen companies: test accuracy 26.29%, against 28.43% on the requested split.
+
+FLAGS
+   1. Weak signal: the tree reaches 31.48% and Naive Bayes 29.17%, against 26.96% for always guessing Strong Negative. The features describe the company and the kind of filing, not the news itself, so this is expected.
+   2. Snapshot limitation: size_category, market_cap and employees are not point-in-time. Each of the 3,703 companies has one value for all its events, taken in October 2026 and attached to events back to 2016-01-04. sector and exchange are snapshots too. Today's market_cap also reflects returns earned after the earlier events, so this is look-ahead.
+   3. market_cap works as a company ID: 3,703 distinct values for 3,703 companies. An unlimited tree can use it to memorise a company's history. Depth 10 shows little of this: with no company in both train and test, tree accuracy moves from 31.48% to 31.31% and macro AUC from 0.6271 to 0.6186. The unlimited tree falls to 26.29% on unseen companies.
+   4. Size partly stands in for the excluded volatility: across companies, Spearman(market_cap, trailing_volatility_1y) is -0.59. Across events, Spearman with |CAR[-1,+1]| is -0.26 for market_cap and +0.37 for volatility. No formula ties them together, but they are not independent. Removing all three size columns takes macro AUC from 0.6271 to 0.6130 for the tree and from 0.6048 to 0.5993 for Naive Bayes.
+   5. size_category is pd.qcut of market_cap, so it holds no extra information, and Naive Bayes treats the three size columns as independent evidence. Both are kept as requested. Using market_cap as the only size column barely changes the scores (Naive Bayes macro AUC 0.6036, tree 0.6231).
+   6. Timing: filing_timeliness and filing_day_of_week are known at filing, but the label's window is anchored on report_date, not filing_date. 99,737 (25.44%) of events were filed after CAR[-1,+1] had closed, including every Slightly Late and Late row. For those rows these two features are not known before the reaction. No formula links them to CAR, and removing both leaves the results almost unchanged (tree macro AUC 0.6283, Naive Bayes 0.6033).
+   7. filing_timeliness uses calendar days from Phase 1: 86.9% of Slightly Late filings are within 4 business days, so on time under the SEC's rule. 1 row has a filing_date before report_date and the longest gap is 965 days; both are kept as filed.
+   8. Same-day filings: 36,211 (9.24%) of rows share a company and trading day with another row, and always share its label because they share one CAR. A random split puts 7.65% of test rows beside a training row with the same answer. Keeping each company-day on one side gives tree accuracy 31.24% and macro AUC 0.6252.
+   9. Naive Bayes is unstable on rare one-hot columns: 47 rows are Security Incident and 128 are PNK (one company). Their tiny variances differ by class and shift every row's score. Over five other random splits its accuracy runs 27.97% to 29.02% while AUC stays at 0.6039 to 0.6052. On the company-day split it scores 24.84%, below that split's 26.79% baseline. Without the two columns, accuracy is 29.77% on the main split and 29.48% to 29.86% on the five others. The columns are kept as requested, so compare the models on AUC more than on Naive Bayes accuracy. The tree moves far less: 31.29% to 31.55%.
+  10. Neutral is the smallest class (9.91%) and the tree predicts it for 0.19% of test rows, so its precision and recall there rest on few predictions.
+  11. Bad prices can remain: 41 kept events touch a one-way price suspect (raw/price_one_way_suspects.csv) and 854 have |CAR[-1,+1]| above 100%, some of them real. The label only records which bucket a CAR falls in, and removing the suspects leaves tree accuracy at 31.48%.
+  12. Blank employees is not random: dropped rows are 7.5% of Small but 2.0% of Mega-cap events, so the rows used lean toward larger companies.
+  13. Survivorship: the universe is today's SEC ticker list, so companies that disappeared since 2016 are absent, which is inherited from the Phase 2 dataset.
+  14. A random split also ignores time. Training on the earliest 80% and testing from 2025-01-13 gives tree accuracy 33.07% and macro AUC 0.6189, against a baseline of 32.25% because the class mix shifts. That is only 0.83 percentage points above the baseline, and Naive Bayes falls below it at 30.91%, so the requested random split makes accuracy look better than it would be on future filings.
+
+WROTE
+  processed/classification_events.csv (392,038 rows), classification_metrics.csv, classification_confusion.csv, classification_roc_points.csv
+  processed/220227286.xlsx: T2_Classification_Data, T2_Classification_Results, T2_Classification_Notes
+  raw/classification_dropped_companies.csv (197 rows)

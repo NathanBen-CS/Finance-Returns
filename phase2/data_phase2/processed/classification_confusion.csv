@@ -1,0 +1,11 @@
+model,true class,predicted Strong Negative,predicted Negative,predicted Neutral,predicted Positive,predicted Strong Positive
+Decision Tree (max_depth=10),Strong Negative,9581,3284,29,1677,6569
+Decision Tree (max_depth=10),Negative,3698,5237,35,2616,3503
+Decision Tree (max_depth=10),Neutral,1557,2975,29,1548,1658
+Decision Tree (max_depth=10),Positive,3289,5060,36,2827,3351
+Decision Tree (max_depth=10),Strong Positive,7758,3290,19,1773,7009
+Gaussian Naive Bayes,Strong Negative,9778,80,938,5058,5286
+Gaussian Naive Bayes,Negative,3944,75,1745,6355,2970
+Gaussian Naive Bayes,Neutral,1705,38,1003,3553,1468
+Gaussian Naive Bayes,Positive,3526,61,1693,6400,2883
+Gaussian Naive Bayes,Strong Positive,8005,57,874,5294,5619

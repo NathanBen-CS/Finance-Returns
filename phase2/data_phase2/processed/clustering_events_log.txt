@@ -1,0 +1,221 @@
+EECS 4412 Phase 2, Task 3: k-means clustering of the Task 2 events
+======================================================================
+
+STEP 1: TABLE AND ENCODING
+  Source: processed/classification_events.csv, unchanged. 392,038 events from 3,703 companies, already filtered for price_data_unreliable and blank features.
+  Matches Task 2 exactly: 392,038 rows, 3,703 companies, 33 encoded columns (the same names, in the same order, from the same encode()).
+  The brief expected 61 encoded columns. These 8 features give 33, the same as Task 2: 2 ordinal + 2 log columns + 11 sector + 6 exchange + 7 event_category + 5 filing_day_of_week. 61 cannot come from this feature set; nothing was added to reach it.
+  Deliberate difference from Task 2: the z-score of log_market_cap and log_employees is fitted on all rows, not on training rows. Clustering has no held-out test to protect, so this is not leakage.
+    log_market_cap: mean 20.9695, sd 2.7367 on all rows; mean 20.9672, sd 2.7378 on Task 2's training rows
+    log_employees: mean 7.0309, sd 2.5924 on all rows; mean 7.0294, sd 2.5938 on Task 2's training rows
+  reaction_category, the CAR and the other labels are not inputs. They are compared with the clusters only after fitting.
+  Share of total variance per feature, which is what k-means sees: size_category 19.6%, log_employees 15.5%, log_market_cap 15.5%, sector 13.4%, filing_day_of_week 12.3%, exchange 11.0%, event_category 10.9%, filing_timeliness 1.9%
+
+STEP 2: WHY THESE FOUR K VALUES
+  k=2 is a pure direction split: Up = car_minus1_plus1 > 0, Down = car_minus1_plus1 <= 0, defined from the CAR's sign and independent of the 5-class bucket.
+  k=3 is sign with magnitude dropped: Negative (Strong Negative + Negative), Neutral, Positive (Positive + Strong Positive).
+  k=4 has no clean collapse of the 5-class label. It is only an interpolation point on the elbow and silhouette curves, so no label is forced onto it.
+  k=5 is reaction_category as stored, which meets the assignment's rule that one k must equal the number of existing classes.
+  k=6 to 10 only extend the elbow curve for context and are not part of the comparisons.
+  The assignment names k=3, 4, 5. k=2 is added on top of that, for the direction question.
+  Up/Down counts: 200,655 (51.18%) Down, 191,383 (48.82%) Up. 3 rows have a stored CAR of exactly 0 and count as Down.
+  3-way counts: 181,143 (46.21%) Negative, 38,837 (9.91%) Neutral, 172,058 (43.89%) Positive
+  Up/Down is not a collapse of the 5 classes: the Neutral rows split 19,512 Down and 19,325 Up.
+
+STEP 3: K-MEANS, K=2 TO 10
+  scikit-learn KMeans, random_state=42, n_init=10. Clusters are renumbered 1..k from the largest down, because k-means numbers mean nothing.
+  Silhouette needs every pairwise distance, so it is computed on a fixed random sample of 20,000 rows (random_state=42). The range is the same score on five other samples (random_state 0-4).
+  Total sum of squares (the SSE of k=1): 2,534,647
+    k          SSE       drop   drop %  explained  silhouette             range  iterations
+    2    1,669,064    865,583    34.2%      34.2%      0.2769     0.2765-0.2787           6
+    3    1,477,744    191,320    11.5%      41.7%      0.1689     0.1689-0.1707          14
+    4    1,393,702     84,042     5.7%      45.0%      0.1233     0.1226-0.1241          17
+    5    1,338,965     54,736     3.9%      47.2%      0.1227     0.1231-0.1245          17
+    6    1,299,203     39,763     3.0%      48.7%      0.1147     0.1154-0.1164          21
+    7    1,265,233     33,969     2.6%      50.1%      0.1079     0.1078-0.1090          45
+    8    1,237,913     27,320     2.2%      51.2%      0.1037     0.1031-0.1044          25
+    9    1,207,855     30,058     2.4%      52.3%      0.0969     0.0952-0.0973          55
+   10    1,185,698     22,157     1.8%      53.2%      0.0953     0.0938-0.0959          53
+  Lowest SSE among the required k: k=5 (1,338,965), which is also the lowest of the assignment's k=3, 4, 5. This is expected and does not make k=5 the best choice: SSE never rises as k grows, because more centroids always fit closer.
+  Elbow: there is a mild bend at k=3 but no sharp knee. On the k=2 to 10 curve SSE drops by 191,320 reaching k=3, 84,042 reaching k=4 and 54,736 reaching k=5, then by 3.0%, 2.6%, 2.2%, 2.4% and 1.8% of what is left, with no step that stands out. Going from one cluster to k=2 removes 34.2% of the total sum of squares, and k=10 still explains only 53.2%.
+  Silhouette is highest at k=2 (0.2769) and falls as k grows, with k=4 (0.1233) and k=5 (0.1227) level within sampling noise. Every value is weak: the rows form a gradient rather than separate groups.
+
+  Cluster sizes:
+    k=2: 1: 217,025 (55.36%), 2: 175,013 (44.64%)
+    k=3: 1: 162,894 (41.55%), 2: 126,929 (32.38%), 3: 102,215 (26.07%)
+    k=4: 1: 114,772 (29.28%), 2: 102,439 (26.13%), 3: 96,788 (24.69%), 4: 78,039 (19.91%)
+    k=5: 1: 91,390 (23.31%), 2: 80,613 (20.56%), 3: 78,537 (20.03%), 4: 75,089 (19.15%), 5: 66,409 (16.94%)
+
+STEP 4: DO THE CLUSTERS RECOVER THE LABEL? (k=4 has no label and is not checked)
+
+  k=2 vs Up/Down: purity 0.5170 (always guessing the largest class gives 0.5118), NMI 0.0010, ARI 0.0011. With shuffled labels: purity 0.5118, NMI 0.00000, ARI +0.00000.
+ cluster   Down     Up  total  largest_class_share
+       1 107505 109520 217025                0.505
+       2  93150  81863 175013                0.532
+
+  k=3 vs Negative/Neutral/Positive: purity 0.4662 (always guessing the largest class gives 0.4621), NMI 0.0044, ARI 0.0006. With shuffled labels: purity 0.4621, NMI 0.00001, ARI -0.00001.
+ cluster  Negative  Neutral  Positive  total  largest_class_share
+       1     73964    15828     73102 162894                0.454
+       2     54460    16397     56072 126929                0.442
+       3     52719     6612     42884 102215                0.516
+
+  k=5 vs reaction_category: purity 0.2860 (always guessing the largest class gives 0.2696), NMI 0.0153, ARI 0.0124. With shuffled labels: purity 0.2696, NMI 0.00001, ARI -0.00001.
+ cluster  Strong Negative  Negative  Neutral  Positive  Strong Positive  total  largest_class_share
+       1            26454     16317     8002     15169            25448  91390                0.289
+       2            14504     19486    11304     19934            15385  80613                0.247
+       3            19235     16045     8200     15829            19228  78537                0.245
+       4            29698      9968     4493      8566            22364  75089                0.396
+       5            15810     13626     6838     13315            16820  66409                0.253
+
+STEP 5: THE k=5 CLUSTERS IN PLAIN TERMS
+  Cluster 1 (91,390 (23.31%) from 999 companies): Mid companies on several Nasdaq tiers; largest sectors Healthcare 26.0% and Financial Services 24.0%; most common filing Financial/Earnings 46.2%.
+    mean market_cap $0.54B, median $0.38B; dominant size_category Mid 78.2%; dominant exchange NMS 38.4%
+    Strong Negative 28.9%, Negative 17.9%, Neutral 8.8%, Positive 16.6%, Strong Positive 27.8%
+    Strong share 56.8%; Up share 48.8%; mean CAR +0.67%, median CAR -0.14%, median |CAR| 3.72%; mean trailing volatility 0.70 (reference only)
+  Cluster 2 (80,613 (20.56%) from 641 companies): Mega-cap companies on NYSE; largest sectors Industrials 19.8% and Financial Services 17.0%; most common filing Financial/Earnings 45.8%.
+    mean market_cap $110.97B, median $28.19B; dominant size_category Mega-cap 99.1%; dominant exchange NYQ 90.9%
+    Strong Negative 18.0%, Negative 24.2%, Neutral 14.0%, Positive 24.7%, Strong Positive 19.1%
+    Strong share 37.1%; Up share 50.8%; mean CAR +0.13%, median CAR +0.06%, median |CAR| 2.10%; mean trailing volatility 0.34 (reference only)
+  Cluster 3 (78,537 (20.03%) from 724 companies): Large companies on NYSE; largest sectors Financial Services 16.5% and Industrials 16.0%; most common filing Financial/Earnings 49.1%.
+    mean market_cap $3.05B, median $2.49B; dominant size_category Large 75.9%; dominant exchange NYQ 88.9%
+    Strong Negative 24.5%, Negative 20.4%, Neutral 10.4%, Positive 20.2%, Strong Positive 24.5%
+    Strong share 49.0%; Up share 49.9%; mean CAR +0.20%, median CAR -0.01%, median |CAR| 2.91%; mean trailing volatility 0.45 (reference only)
+  Cluster 4 (75,089 (19.15%) from 827 companies): Small companies on Nasdaq Capital Market; largest sectors Healthcare 44.5% and Technology 14.6%; most common filing Financial/Earnings 32.8%.
+    mean market_cap $0.05B, median $0.03B; dominant size_category Small 96.2%; dominant exchange NCM 76.7%
+    Strong Negative 39.6%, Negative 13.3%, Neutral 6.0%, Positive 11.4%, Strong Positive 29.8%
+    Strong share 69.3%; Up share 44.1%; mean CAR +1.12%, median CAR -0.97%, median |CAR| 5.76%; mean trailing volatility 2.00 (reference only)
+  Cluster 5 (66,409 (16.94%) from 627 companies): Large/Mega-cap companies on Nasdaq Global Select; largest sectors Technology 21.0% and Healthcare 20.8%; most common filing Financial/Earnings 47.4%.
+    mean market_cap $13.33B, median $5.40B; dominant size_category Large 52.8%; dominant exchange NMS 96.0%
+    Strong Negative 23.8%, Negative 20.5%, Neutral 10.3%, Positive 20.0%, Strong Positive 25.3%
+    Strong share 49.1%; Up share 50.5%; mean CAR +0.87%, median CAR +0.05%, median |CAR| 2.92%; mean trailing volatility 0.47 (reference only)
+  Share of all events by event_category, for reference: Financial/Earnings 44.3%, Management/Governance 24.0%, Other 15.2%, M&A/Contracts 14.2%
+  size_category is quartiles of this dataset's companies: Mega-cap starts at $5.8B here, far below the conventional meaning of the word.
+
+STEP 6: WHAT THE CLUSTERS FOLLOW INSTEAD
+  column                     k=2 NMI   k=2 ARI   k=3 NMI   k=3 ARI   k=5 NMI   k=5 ARI
+  size_category               0.5662    0.4506    0.6672    0.6109    0.6204    0.5541
+  exchange                    0.2340    0.2337    0.2762    0.2255    0.4616    0.3852
+  sector                      0.0232    0.0154    0.0368    0.0274    0.0555    0.0403
+  event_category              0.0087    0.0085    0.0134    0.0167    0.0128    0.0062
+  filing_day_of_week          0.0006    0.0008    0.0010    0.0013    0.0011    0.0008
+  filing_timeliness           0.0044    0.0090    0.0049    0.0077    0.0038    0.0010
+  volatility_tier             0.1483    0.1419    0.1742    0.1403    0.1646    0.1274
+  strong_or_not               0.0222    0.0283    0.0230    0.0221    0.0199    0.0178
+  Task 1 scores cover 94.1% of these events (3,436 companies).
+  k=2: 99.1% of companies sit wholly in one cluster; 99.8% of events are in their company's main cluster; the clusters hold 64.4% of the variance of Task 1's PC1, 0.0% of PC2 and 0.0% of PC3.
+  k=3: 97.6% of companies sit wholly in one cluster; 99.4% of events are in their company's main cluster; the clusters hold 81.1% of the variance of Task 1's PC1, 1.3% of PC2 and 2.9% of PC3.
+  k=5: 96.9% of companies sit wholly in one cluster; 99.3% of events are in their company's main cluster; the clusters hold 87.3% of the variance of Task 1's PC1, 54.4% of PC2 and 4.4% of PC3.
+  Share of the Up/Down variance that lies between companies: 1.46%. For Strong vs not: 13.03%. Random labels would give about 0.94% from the number of companies alone.
+  A grouping of companies can only reach what lies between companies, so this caps what these clusters can recover.
+
+STEP 7: COMPARISON WITH TASK 2, SCORED THE SAME WAY
+  k-means has no predictions, so each cluster gets the most common label among its training rows and predicts that for its test rows.
+  Tree (max_depth=10) and GaussianNB are refitted on each version of the label, with Task 2's encoding and split. k-means itself saw no labels; it did see the test rows' features.
+  split                                         label                       approach                     baseline  accuracy   above      NMI      ARI
+  Task 2 split (stratified 80/20)               Up/Down                     Decision tree                  51.22%    51.61%    0.39   0.0006   0.0010
+  Task 2 split (stratified 80/20)               Up/Down                     Gaussian Naive Bayes           51.22%    51.38%    0.16   0.0016   0.0006
+  Task 2 split (stratified 80/20)               Up/Down                     k-means, cluster majority      51.22%    51.61%    0.40   0.0009   0.0010
+  Task 2 split (stratified 80/20)               Negative/Neutral/Positive   Decision tree                  46.21%    47.13%    0.92   0.0014   0.0040
+  Task 2 split (stratified 80/20)               Negative/Neutral/Positive   Gaussian Naive Bayes           46.21%    40.91%   -5.30   0.0068   0.0057
+  Task 2 split (stratified 80/20)               Negative/Neutral/Positive   k-means, cluster majority      46.21%    46.63%    0.43   0.0038   0.0122
+  Task 2 split (stratified 80/20)               reaction_category           Decision tree                  26.96%    31.48%    4.52   0.0345   0.0367
+  Task 2 split (stratified 80/20)               reaction_category           Gaussian Naive Bayes           26.96%    29.17%    2.21   0.0270   0.0262
+  Task 2 split (stratified 80/20)               reaction_category           k-means, cluster majority      26.96%    28.48%    1.52   0.0118   0.0213
+  No company in both train and test             Up/Down                     Decision tree                  50.89%    51.67%    0.79   0.0006   0.0010
+  No company in both train and test             Up/Down                     Gaussian Naive Bayes           50.89%    51.53%    0.64   0.0018   0.0008
+  No company in both train and test             Up/Down                     k-means, cluster majority      50.89%    52.05%    1.16   0.0013   0.0017
+  No company in both train and test             Negative/Neutral/Positive   Decision tree                  46.02%    46.77%    0.75   0.0007   0.0012
+  No company in both train and test             Negative/Neutral/Positive   Gaussian Naive Bayes           46.02%    40.53%   -5.48   0.0065   0.0060
+  No company in both train and test             Negative/Neutral/Positive   k-means, cluster majority      46.02%    46.77%    0.76   0.0039   0.0135
+  No company in both train and test             reaction_category           Decision tree                  27.05%    31.31%    4.26   0.0305   0.0361
+  No company in both train and test             reaction_category           Gaussian Naive Bayes           27.05%    28.83%    1.78   0.0269   0.0252
+  No company in both train and test             reaction_category           k-means, cluster majority      27.05%    28.79%    1.74   0.0151   0.0195
+  Train on the earliest 80%, test from 2025-01-13Up/Down                     Decision tree                  53.58%    51.87%   -1.71   0.0007   0.0013
+  Train on the earliest 80%, test from 2025-01-13Up/Down                     Gaussian Naive Bayes           53.58%    49.63%   -3.95   0.0014  -0.0016
+  Train on the earliest 80%, test from 2025-01-13Up/Down                     k-means, cluster majority      53.58%    51.62%   -1.96   0.0007   0.0010
+  Train on the earliest 80%, test from 2025-01-13Negative/Neutral/Positive   Decision tree                  49.64%    48.38%   -1.26   0.0011   0.0045
+  Train on the earliest 80%, test from 2025-01-13Negative/Neutral/Positive   Gaussian Naive Bayes           49.64%    42.29%   -7.35   0.0047   0.0028
+  Train on the earliest 80%, test from 2025-01-13Negative/Neutral/Positive   k-means, cluster majority      49.64%    46.94%   -2.70   0.0042  -0.0084
+  Train on the earliest 80%, test from 2025-01-13reaction_category           Decision tree                  32.25%    33.07%    0.83   0.0318   0.0459
+  Train on the earliest 80%, test from 2025-01-13reaction_category           Gaussian Naive Bayes           32.25%    30.91%   -1.33   0.0228   0.0268
+  Train on the earliest 80%, test from 2025-01-13reaction_category           k-means, cluster majority      32.25%    31.02%   -1.23   0.0129   0.0253
+  Check: the tree and Naive Bayes on the 5-class label reproduce Task 2's accuracy exactly (31.4802% and 29.1743%).
+  k=2 cluster majorities: 1: Up, 2: Down.
+  k=3 cluster majorities: 1: Negative, 2: Positive, 3: Negative. Never predicted: Neutral.
+  k=5 cluster majorities: 1: Strong Negative, 2: Positive, 3: Strong Negative, 4: Strong Negative, 5: Strong Positive. Never predicted: Negative, Neutral.
+
+STEP 8: CHECKS ON SCALING AND SEEDS (reported only; the results above use the requested encoding and seed)
+  check                                         k   purity      NMI      ARI  ARI with main  NMI size  NMI exch  NMI event
+  z-score fitted on Task 2's training rows      2   0.5170   0.0010   0.0011          1.000     0.566     0.234      0.009
+  z-score fitted on Task 2's training rows      3   0.4662   0.0044   0.0006          1.000     0.667     0.276      0.013
+  z-score fitted on Task 2's training rows      5   0.2860   0.0153   0.0124          1.000     0.620     0.462      0.013
+  Ordinal columns z-scored too                  2   0.5169   0.0010   0.0011          0.936     0.526     0.248      0.010
+  Ordinal columns z-scored too                  3   0.4679   0.0029   0.0003          0.280     0.415     0.183      0.051
+  Ordinal columns z-scored too                  5   0.2832   0.0150   0.0098          0.349     0.543     0.246      0.050
+  market_cap as the only size column            2   0.5162   0.0012   0.0010          0.684     0.465     0.327      0.012
+  market_cap as the only size column            3   0.4643   0.0036  -0.0002          0.347     0.358     0.699      0.012
+  market_cap as the only size column            5   0.2851   0.0161   0.0102          0.544     0.404     0.698      0.017
+  No size columns                               2   0.5126   0.0003   0.0006          0.194     0.131     0.659      0.004
+  No size columns                               3   0.4628   0.0033  -0.0003          0.248     0.216     0.885      0.010
+  No size columns                               5   0.2904   0.0177   0.0140          0.274     0.158     0.714      0.376
+  Five other seeds (random_state 0-4):
+    k=2: SSE 1,669,064-1,669,064 (main 1,669,064); ARI with the main clusters 0.999-1.000; ARI with the label +0.0011 to +0.0011
+    k=3: SSE 1,477,744-1,477,744 (main 1,477,744); ARI with the main clusters 0.997-1.000; ARI with the label +0.0006 to +0.0006
+    k=4: SSE 1,393,701-1,393,702 (main 1,393,702); ARI with the main clusters 0.999-1.000
+    k=5: SSE 1,338,966-1,339,122 (main 1,338,965); ARI with the main clusters 0.818-0.999; ARI with the label +0.0124 to +0.0130
+  Volatility is not an input, but does it explain the magnitude pattern? Strong share by k=5 cluster, inside each volatility tier:
+                    1     2     3     4     5  spread
+volatility_tier                                      
+Low             0.340 0.298 0.350 0.320 0.330   0.052
+Medium          0.525 0.437 0.504 0.564 0.501   0.127
+High            0.647 0.567 0.610 0.657 0.607   0.090
+Very High       0.701 0.670 0.705 0.724 0.697   0.054
+  Spread between clusters: 32.3 points overall, 5.2 to 12.7 points inside one tier.
+    Low        5-class test rows  22,765: baseline 26.49%, tree 27.53% (+1.04), labelled clusters 20.98% (-5.52)
+    Medium     5-class test rows  20,944: baseline 25.43%, tree 28.41% (+2.98), labelled clusters 24.59% (-0.85)
+    High       5-class test rows  17,599: baseline 32.56%, tree 32.94% (+0.38), labelled clusters 31.82% (-0.74)
+    Very High  5-class test rows  17,100: baseline 40.01%, tree 38.99% (-1.02), labelled clusters 39.82% (-0.19)
+  Up/Down on the Task 2 test rows: tree and labelled clusters agree on 67.04%; where they differ the tree is right 49.99% of the time. The tree says Up for 11.7% of Small and 67.1% of Mega-cap rows.
+
+STEP 9: COMPARISON AND VERDICT
+  k=2 vs Up/Down: not recovered. Purity 0.5170 is 0.51 points above always guessing Down, NMI 0.0010, ARI 0.0011. The clusters split companies by size (NMI with size_category 0.566, ARI 0.451), and Up share is 50.5% and 46.8%.
+  k=3 vs Negative/Neutral/Positive: not recovered. Purity 0.4662 is 0.41 points above the largest class, NMI 0.0044, ARI 0.0006. Negative share is 42.9% to 51.6% and Positive 42.0% to 44.9% across clusters; Neutral runs 6.5% to 12.9%. NMI with size_category is 0.667.
+  k=5 vs reaction_category: the highest alignment of the three and still weak. Purity 0.2860 is 1.64 points above the largest class, NMI 0.0153, ARI 0.0124. The small part it finds is magnitude: Strong share runs from 37.1% in the cluster with the largest companies to 69.3% in the cluster with the smallest, while Up share only runs 44.1% to 50.8%. NMI with Strong vs not is 0.0199 and with Up/Down 0.0010.
+  The axis the clusters follow is company size and exchange, as in Task 1. NMI with size_category is 0.566, 0.667, 0.620 at k=2, 3, 5 and with exchange 0.234, 0.276, 0.462, against 0.0010, 0.0044, 0.0153 with the matching label. Task 1's PC1 is company size and its PC2 is mainly NMS vs NYQ. On the 94.1% of events with a Task 1 score, the clusters hold 64.4%, 81.1% and 87.3% of the variance of PC1, and at k=5 also 54.4% of PC2. They group companies, not filings: at k=5, 96.9% of companies sit wholly in one cluster, NMI with event_category is only 0.0128, and Financial/Earnings is the most common filing in all five clusters, so a name like "large-cap tech earnings filers" would claim more than the clusters show.
+  Why they cannot do better: only 1.46% of the Up/Down variance lies between companies, and 0.94% would appear by chance. Direction changes from filing to filing within a company, and these clusters do not.
+  Same test rows, 5-class label: tree 31.48%, Naive Bayes 29.17%, labelled clusters 28.48%, baseline 26.96%. NMI 0.0345, 0.0270, 0.0118; ARI 0.0367, 0.0262, 0.0213.
+  Same test rows, 3-way label: tree 47.13%, Naive Bayes 40.91%, labelled clusters 46.63%, baseline 46.21%. The clusters have the higher NMI and ARI here (0.0038 and 0.0122, tree 0.0014 and 0.0040), but all of these are close to zero.
+  Same test rows, Up/Down: k=2 behaves differently. Tree 51.61%, Naive Bayes 51.38%, labelled clusters 51.61%, baseline 51.22%. The clusters tie the tree because neither finds direction. Both lean on size: Up share runs from 44.6% at Small to 50.7% at Mega-cap, and the tree says Up for 11.7% of Small and 67.1% of Mega-cap rows. They agree on 67.0% of test rows, and where they differ the tree is right 50.0% of the time.
+  Verdict: classification is the better approach for predicting reaction_category when a label is available, and that rests on the decision tree. On the 5-class label the tree gains 4.52 points over the baseline against 1.52 for labelled clusters, and it stays ahead on unseen companies (+4.26 vs +1.74) and on the later rows (+0.83 vs -1.23). The clusters also need those same labels to predict anything. Naive Bayes does not share this clearly: +2.21 vs +1.52 for labelled clusters on the Task 2 split, level on unseen companies (+1.78 vs +1.74) and on the later rows (-1.33 vs -1.23), and 5.30 points below the baseline on the 3-way label, where it predicts Neutral for 20.9% of rows against 9.9% in truth. The tree's win is about how large a reaction is, not which way it goes. On direction no approach is better and none is useful: the gain is under half a point on the Task 2 split, and all three fall below the baseline on the later rows. Clustering is better described as surfacing company structure (size and exchange) than reaction structure.
+
+FLAGS
+   1. The brief expected 61 encoded columns. These 8 features give 33, the same as Task 2: 2 ordinal + 2 log columns + 11 sector + 6 exchange + 7 event_category + 5 filing_day_of_week. 61 cannot come from this feature set; nothing was added to reach it.
+   2. The size of each column matters here, which it did not in Task 2. Feature scale barely affects trees and Naive Bayes, but it drives k-means. With the requested encoding, size_category, log_market_cap and log_employees hold 50.5% of the total variance, and size_category alone holds 19.6% because it stays on a 1-4 scale. So size is what k-means mostly sees. Those columns also carry nearly one fact three times, as size_category is quartiles of market_cap. The encoding is kept as requested.
+   3. The cluster boundaries depend on that scaling, but the finding does not. Z-scoring the ordinals changes the partition a lot at k=3 and k=5 (ARI with the main clusters 0.280 and 0.349), and removing the size columns moves the clusters onto exchange and event_category (at k=5, NMI 0.714 and 0.376). Across all these checks the largest ARI with the matching label is 0.0140. Describe the clusters as what this encoding produces, not as natural groups. Fitting the z-score on Task 2's training rows instead changes almost nothing (ARI with the main clusters 1.000 at k=5).
+   4. Rows from one company repeat one position on five of the eight features, because sector, exchange, size_category, market_cap and employees are per-company values. Only event_category, filing_day_of_week and filing_timeliness can move a filing, and they carry 25.0% of the variance. Companies that file more count more.
+   5. Snapshot limitation: size_category, market_cap and employees are single October 2026 values attached to events back to 2016-01-04, and sector and exchange are snapshots too, so cluster membership uses information from after most events.
+   6. The only direction signal may be an artefact. Up share is 44.1% in the cluster with the smallest companies and 50.8% in the one with the largest. Companies that are small today may be small because their stock fell, and that cluster's mean CAR is +1.12% with a median of -0.97%, so skewed returns would also produce this. Without point-in-time market caps, this data cannot separate those from a real effect. Do not read it as a way to predict direction.
+   7. Size stands in for the excluded volatility, and this accounts for most of the magnitude pattern. trailing_volatility_1y is not an input, but the k=5 clusters line up with its quartiles (NMI 0.165), with mean volatility running 0.34 to 2.00. The Strong share differs by 32.3 points between clusters overall but only 5.2 to 12.7 points inside one volatility tier. Inside a tier, on the 5-class test rows, the tree gains -1.02 to +2.98 points over that tier's largest class and labelled clusters -5.52 to -0.19. So excluding the column did not fully remove what it measures.
+   8. Purity has a floor: it cannot fall far below the largest class's share, so read it against that share and not on its own. NMI and ARI are clearly above their shuffled values, but with 392,038 rows that shows little. The size of the effect is the point, and these rows are not independent: 36,211 (9.24%) share a company and trading day with another row, and always share its CAR.
+   9. Labelling clusters by majority is a yardstick, not a fair test of clustering, which never tries to predict anything. It also predicts few classes: at k=5 only Positive, Strong Negative, Strong Positive, and at k=3 never Neutral. Several k=5 majorities are near ties.
+  10. The random split flatters every approach. Training on the earliest 80% and testing from 2025-01-13, the 5-class baseline is 32.25%: tree 33.07%, Naive Bayes 30.91%, labelled clusters 31.02%. On Up/Down the baseline is 53.58%: tree 51.87%, Naive Bayes 49.63%, labelled clusters 51.62%. On companies not seen in training, 5-class: tree 31.31%, labelled clusters 28.79%, baseline 27.05%.
+  11. filing_timeliness and filing_day_of_week can come after the reaction, as flagged in Task 2. This matters little here: their NMI with the clusters is at most 0.0049.
+  12. k-means can settle in different local solutions at k=5. Over five other seeds SSE runs 1,338,966 to 1,339,122 (main 1,338,965) and ARI with the main clusters runs 0.818 to 0.999, so one seed finds a visibly different partition with a slightly worse SSE. ARI with the label stays at 0.0124 to 0.0130. No seed was chosen for its result.
+  13. Silhouette uses a 20,000-row sample, not all rows. Over five other samples it moves by at most 0.0022, so k=4 and k=5 cannot be ranked. Mixing one-hot and numeric columns in one Euclidean distance also limits how much the score can mean.
+  14. Inherited from Task 2: 3 rows with a stored CAR of exactly 0 count as Down, one-way price suspects can still affect labels (not cluster inputs), blank employees removed more small companies, and the universe has survivorship bias.
+
+WROTE
+  processed/clustering_events.csv (392,038 rows), clustering_metrics.csv, clustering_k5_profile.csv
+  processed/220227286.xlsx: T3_Clustering_Data, T3_Clustering_Results, T3_Clustering_Notes
+
+SUPPLEMENTARY CHARTS 32 AND 33
+Chart 32: Task 1's processed/pca_companies_scores.csv joined by ticker to each company's most common cluster_k5, taken from processed/clustering_events.csv with ticker from classification_events.csv by event_id.
+  115 of 3,703 companies have events in more than one cluster. 2 of them needed a tie-break, 2 of those plotted; a tie goes to the lowest cluster number.
+  3,436 of 3,703 companies (92.79%) have a PC1/PC2 score and are plotted. The rest were left out of Task 1. Coverage by cluster: 2: 100.0%, 5: 97.1%, 3: 99.3%, 1: 91.8%, 4: 78.8%.
+  Variance between clusters across events: PC1 87.3%, PC2 54.4% (the 87.3% and 54.4% of Task 3). Across the plotted companies, one point each: PC1 86.8%, PC2 54.2%.
+  PC2 variance between clusters 2, 5, 3: 71.4%; between clusters 1, 4: 12.0%.
+  Median PC1, PC2 by cluster: 2: +2.56, -0.76, 5: +0.98, +1.90, 3: +1.02, -1.05, 1: -1.02, +0.42, 4: -3.22, -0.28. Silhouette in this plane: +0.31.
+Chart 33: classification_events.csv (market_cap, ticker), clustering_events.csv (cluster_k5) and car_minus1_plus1 from full_dataset.csv, joined by event_id. market_cap is on a log axis.
+  Sample: 20,000 of 392,038 events, numpy permutation with seed 42, the same rows as the silhouette sample. 165 of them (0.83%) lie beyond ±50% and are off the chart but still in the sample and its percentiles.
+  CAR[-1,+1] median and 10th-90th percentile by cluster: 2: +0.06% (-5.0% to +4.9%), 0 off chart, 5: +0.13% (-7.1% to +7.9%), 11 off chart, 3: -0.08% (-7.5% to +7.3%), 9 off chart, 1: +0.01% (-10.0% to +9.8%), 38 off chart, 4: -1.01% (-14.9% to +14.1%), 107 off chart.
+  Variance of CAR between clusters: 0.33% of the points on the chart, 0.00% of all events. Of |CAR|, on the chart: 6.51%.

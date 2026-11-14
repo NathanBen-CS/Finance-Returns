@@ -44,6 +44,12 @@ def main():
 
     df = events.merge(reactions, on="event_id", validate="one_to_one")
     df = df.merge(companies, on="ticker", how="left", validate="many_to_one")
+    # Events whose price window has a split-like splice or a non-positive close (set by
+    # ../data_phase2/flag_price_splices.py) are dropped first, so they are neither
+    # examples nor part of anyone's history.
+    assert df["price_data_unreliable"].dtype == bool
+    unreliable = int(df["price_data_unreliable"].sum())
+    df = df[~df["price_data_unreliable"]]
     # The Phase 2 pipeline drops every event without a complete price window, so
     # the reaction values are never missing. Check it rather than assume it.
     assert df[["abnormal_return", "car_minus1_plus1", "car_minus1_plus5"]].notna().all().all()
@@ -115,10 +121,12 @@ def main():
         "trading_day": trading_day, "company_start": company_start,
         "event_date": df["report_date"].to_numpy(), "ticker": df["ticker"].to_numpy(),
         "event_id": df["event_id"].to_numpy(),
+        "dropped_unreliable": unreliable,
     }
     with open(cfg.EVENTS_PKL, "wb") as f:
         pickle.dump(data, f)
 
+    print(f"dropped {unreliable:,} events with price_data_unreliable == True")
     print(f"{len(df):,} events from {df['ticker'].nunique():,} companies, "
           f"{len(calendar):,} trading days ({str(calendar[0])[:10]} to {str(calendar[-1])[:10]})")
     print(f"event_x: {event_x.shape[1]} columns | company_x: {company_x.shape[1]} columns"

@@ -1,0 +1,73 @@
+model,class,metric,value
+Decision Tree (max_depth=10),,train_accuracy,0.3264451742499123
+Gaussian Naive Bayes,,train_accuracy,0.29013168383126614
+Decision Tree (max_depth=10),,test_accuracy,0.31480206101418223
+Gaussian Naive Bayes,,test_accuracy,0.2917431894704622
+Decision Tree (max_depth=10),,macro_f1,0.25500313791177315
+Gaussian Naive Bayes,,macro_f1,0.233013739219987
+Decision Tree (max_depth=10),,weighted_f1,0.2949052694548742
+Gaussian Naive Bayes,,weighted_f1,0.25805968253111544
+Decision Tree (max_depth=10),,macro_auc,0.6270809992755263
+Gaussian Naive Bayes,,macro_auc,0.6047897291916609
+Decision Tree (max_depth=10),,largest_class_baseline,0.26961927160122234
+Gaussian Naive Bayes,,largest_class_baseline,0.26961927160122234
+Decision Tree (max_depth=10),Strong Negative,precision,0.3701657458563536
+Decision Tree (max_depth=10),Negative,precision,0.26388189055729117
+Decision Tree (max_depth=10),Neutral,precision,0.19594594594594594
+Decision Tree (max_depth=10),Positive,precision,0.2707595057944641
+Decision Tree (max_depth=10),Strong Positive,precision,0.31729289271163424
+Gaussian Naive Bayes,Strong Negative,precision,0.36271236738630463
+Gaussian Naive Bayes,Negative,precision,0.24115755627009647
+Gaussian Naive Bayes,Neutral,precision,0.16040300655685272
+Gaussian Naive Bayes,Positive,precision,0.24006001500375093
+Gaussian Naive Bayes,Strong Positive,precision,0.30829584110611213
+Decision Tree (max_depth=10),Strong Negative,recall,0.4532166508987701
+Decision Tree (max_depth=10),Negative,recall,0.3470740274372059
+Decision Tree (max_depth=10),Neutral,recall,0.0037337453328183338
+Decision Tree (max_depth=10),Positive,recall,0.19412209022866167
+Decision Tree (max_depth=10),Strong Positive,recall,0.35311602599627184
+Gaussian Naive Bayes,Strong Negative,recall,0.46253547776726583
+Gaussian Naive Bayes,Negative,recall,0.004970508317317251
+Gaussian Naive Bayes,Neutral,recall,0.12913608857988929
+Gaussian Naive Bayes,Positive,recall,0.4394698894458559
+Gaussian Naive Bayes,Strong Positive,recall,0.2830873091843418
+Decision Tree (max_depth=10),Strong Negative,f1,0.407502711439083
+Decision Tree (max_depth=10),Negative,f1,0.29981394017461
+Decision Tree (max_depth=10),Neutral,f1,0.007327858496525584
+Decision Tree (max_depth=10),Positive,f1,0.2261238201887698
+Decision Tree (max_depth=10),Strong Positive,f1,0.3342473592598774
+Gaussian Naive Bayes,Strong Negative,f1,0.40658655245540354
+Gaussian Naive Bayes,Negative,f1,0.00974025974025974
+Gaussian Naive Bayes,Neutral,f1,0.14308131241084165
+Gaussian Naive Bayes,Positive,f1,0.31050627077117143
+Gaussian Naive Bayes,Strong Positive,f1,0.2951543007222587
+Decision Tree (max_depth=10),Strong Negative,support,21140.0
+Decision Tree (max_depth=10),Negative,support,15089.0
+Decision Tree (max_depth=10),Neutral,support,7767.0
+Decision Tree (max_depth=10),Positive,support,14563.0
+Decision Tree (max_depth=10),Strong Positive,support,19849.0
+Gaussian Naive Bayes,Strong Negative,support,21140.0
+Gaussian Naive Bayes,Negative,support,15089.0
+Gaussian Naive Bayes,Neutral,support,7767.0
+Gaussian Naive Bayes,Positive,support,14563.0
+Gaussian Naive Bayes,Strong Positive,support,19849.0
+Decision Tree (max_depth=10),Strong Negative,predicted_share,0.3301066217732884
+Decision Tree (max_depth=10),Negative,predicted_share,0.2531119273543516
+Decision Tree (max_depth=10),Neutral,predicted_share,0.0018875624936230996
+Decision Tree (max_depth=10),Positive,predicted_share,0.13316243240485665
+Decision Tree (max_depth=10),Strong Positive,predicted_share,0.2817314559738802
+Gaussian Naive Bayes,Strong Negative,predicted_share,0.3438169574533211
+Gaussian Naive Bayes,Negative,predicted_share,0.003966431996735027
+Gaussian Naive Bayes,Neutral,predicted_share,0.07974951535557596
+Gaussian Naive Bayes,Positive,predicted_share,0.3400163248648097
+Gaussian Naive Bayes,Strong Positive,predicted_share,0.23245077032955822
+Decision Tree (max_depth=10),Strong Negative,auc,0.6444463392554413
+Decision Tree (max_depth=10),Negative,auc,0.6077343779446298
+Decision Tree (max_depth=10),Neutral,auc,0.6408029644529698
+Decision Tree (max_depth=10),Positive,auc,0.6243291876499528
+Decision Tree (max_depth=10),Strong Positive,auc,0.6180921270746376
+Gaussian Naive Bayes,Strong Negative,auc,0.6248416526581622
+Gaussian Naive Bayes,Negative,auc,0.5855910913879585
+Gaussian Naive Bayes,Neutral,auc,0.6179996904397564
+Gaussian Naive Bayes,Positive,auc,0.6034059464952013
+Gaussian Naive Bayes,Strong Positive,auc,0.5921102649772255
