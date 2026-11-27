@@ -1,0 +1,29 @@
+Settings: USE_TIME_CYCLES=True, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=1, HISTORY_MODE=full, CURRENT_MODE=full, DROP_INPUT_GROUPS=[], SAVE_PREDICTIONS=True
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+epoch  1/15  train loss 1.1494  validation loss 1.1290
+epoch  2/15  train loss 1.1456  validation loss 1.1293
+epoch  3/15  train loss 1.1446  validation loss 1.1270
+epoch  4/15  train loss 1.1440  validation loss 1.1305
+epoch  5/15  train loss 1.1435  validation loss 1.1291
+epoch  6/15  train loss 1.1432  validation loss 1.1285
+epoch  7/15  train loss 1.1430  validation loss 1.1278
+epoch  8/15  train loss 1.1429  validation loss 1.1268
+epoch  9/15  train loss 1.1428  validation loss 1.1265
+epoch 10/15  train loss 1.1425  validation loss 1.1287
+epoch 11/15  train loss 1.1423  validation loss 1.1294
+epoch 12/15  train loss 1.1420  validation loss 1.1280
+epoch 13/15  train loss 1.1420  validation loss 1.1262
+epoch 14/15  train loss 1.1420  validation loss 1.1303
+epoch 15/15  train loss 1.1418  validation loss 1.1316
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.509   baseline 0.535
+  recall               up events 0.672   down events 0.369
+  balanced accuracy    model 0.520   baseline 0.500
+  reaction accuracy    model 0.342   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+predictions written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\predictions\pred_full_seed1.csv (59,271 rows); recomputed from the file: reaction_accuracy_model 0.342343 (logged 0.342343), balanced_accuracy_model 0.520151 (logged 0.520151)
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\predictions\results\pred_full_seed1.json
+
+---------------- stderr

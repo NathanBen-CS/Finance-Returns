@@ -808,10 +808,12 @@ file's own location makes it work from anywhere.
 COMPANIES_CSV = DATA_DIR / "companies.csv"
 EVENTS_CSV = DATA_DIR / "events.csv"
 MARKET_REACTIONS_CSV = DATA_DIR / "market_reactions.csv"
-EVENTS_PKL = DATA_DIR / "tier0_events.pkl"        # written by prepare, read by train
+EVENTS_PKL = Path(__file__).resolve().parent / "tier0_events.pkl"   # written by prepare, read by train; kept beside the scripts
 ```
 
-The full paths of the three input CSVs and the one output file. Because both
+The full paths of the three input CSVs and the one output file. The CSVs stay in
+`data_phase2/processed/` because other Phase 2 scripts share them; the pickle is used
+only by the Tier 0 scripts, so it lives here in `network/`. Because both
 scripts read `EVENTS_PKL` from here, the prepare script writes exactly where the
 train script reads.
 

@@ -1,0 +1,29 @@
+Settings: USE_TIME_CYCLES=True, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=1, HISTORY_MODE=none, CURRENT_MODE=full, DROP_INPUT_GROUPS=['other_profile'], SAVE_PREDICTIONS=False
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+DROP_INPUT_GROUPS: zeroing 2 of 63 current inputs: ['log_employees', 'log_revenue_ttm']
+epoch  1/15  train loss 1.1527  validation loss 1.1322
+epoch  2/15  train loss 1.1502  validation loss 1.1348
+epoch  3/15  train loss 1.1498  validation loss 1.1315
+epoch  4/15  train loss 1.1497  validation loss 1.1323
+epoch  5/15  train loss 1.1494  validation loss 1.1322
+epoch  6/15  train loss 1.1492  validation loss 1.1308
+epoch  7/15  train loss 1.1490  validation loss 1.1316
+epoch  8/15  train loss 1.1488  validation loss 1.1314
+epoch  9/15  train loss 1.1490  validation loss 1.1295
+epoch 10/15  train loss 1.1489  validation loss 1.1338
+epoch 11/15  train loss 1.1488  validation loss 1.1344
+epoch 12/15  train loss 1.1487  validation loss 1.1321
+epoch 13/15  train loss 1.1487  validation loss 1.1349
+epoch 14/15  train loss 1.1486  validation loss 1.1291
+epoch 15/15  train loss 1.1488  validation loss 1.1278
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.530   baseline 0.535
+  recall               up events 0.341   down events 0.694
+  balanced accuracy    model 0.518   baseline 0.500
+  reaction accuracy    model 0.344   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\ablation\results\ablation_nohist_drop-other_profile_seed1.json
+
+---------------- stderr

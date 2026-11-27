@@ -1,0 +1,145 @@
+EECS 4412 Phase 3, Task 1: association analysis of the 8-K filings
+======================================================================
+Merged events + market_reactions (inner) + companies (left): 411,685 rows; dropped 245 with price_data_unreliable; 411,440 filings from 3,900 companies (asserted).
+
+STEP 1: ONE TRANSACTION PER FILING, 5 ITEMS EACH
+  23 distinct items in 5 attributes: event_category (7), filing_timeliness (3), size_category (4), volatility_tier (4), reaction_category (5). Every filing holds exactly one item per attribute.
+    event_category=Financial/Earnings           182,695   44.40%
+    event_category=Management/Governance         97,573   23.72%
+    event_category=Other                         62,626   15.22%
+    event_category=M&A/Contracts                 59,395   14.44%
+    event_category=Legal/Regulatory               7,413    1.80%
+    event_category=Capital/Financing              1,691    0.41%
+    event_category=Security Incident                 47    0.01%
+    filing_timeliness=On-time                   362,352   88.07%
+    filing_timeliness=Slightly Late              46,753   11.36%
+    filing_timeliness=Late                        2,335    0.57%
+    size_category=Small                          93,358   22.69%
+    size_category=Mid                            95,156   23.13%
+    size_category=Large                         104,489   25.40%
+    size_category=Mega-cap                      118,437   28.79%
+    volatility_tier=Low                         123,080   29.91%
+    volatility_tier=Medium                      107,965   26.24%
+    volatility_tier=High                         90,927   22.10%
+    volatility_tier=Very High                    89,468   21.75%
+    reaction_category=Strong Negative           109,903   26.71%
+    reaction_category=Negative                   79,982   19.44%
+    reaction_category=Neutral                    41,395   10.06%
+    reaction_category=Positive                   77,109   18.74%
+    reaction_category=Strong Positive           103,051   25.05%
+
+STEP 2: SUPPORT OF EVERY 2- AND 3-ITEMSET ACROSS DIFFERENT ATTRIBUTES
+  2-itemsets: 207 (207 occur at least once); 3-itemsets: 913 (888 occur at least once).
+  Every one is counted exactly, so the result is what Apriori would return at any minimum support; nothing is pruned.
+  Top 5 by support (recounted from the one-hot table: identical):
+    1. {event_category=Financial/Earnings, filing_timeliness=On-time}                                178,765   43.45%
+    2. {filing_timeliness=On-time, volatility_tier=Low}                                              112,370   27.31%
+    3. {filing_timeliness=On-time, size_category=Mega-cap}                                           106,894   25.98%
+    4. {filing_timeliness=On-time, reaction_category=Strong Negative}                                 97,390   23.67%
+    5. {filing_timeliness=On-time, volatility_tier=Medium}                                            95,910   23.31%
+  Next itemset, rank 6: {filing_timeliness=On-time, size_category=Large} 93,665 (22.77%). No tie at the cut-off.
+  Most frequent 3-itemset: {event_category=Financial/Earnings, filing_timeliness=On-time, volatility_tier=Low} at rank 19, 57,768 (14.04%).
+
+STEP 3: EVERY RULE FROM THE TOP 5 ITEMSETS
+  10 rules (each itemset of length L gives 2^L - 2). Sorted by confidence:
+     # rule                                                                                                  support  confidence    lift  selected
+     1 {event_category=Financial/Earnings} => {filing_timeliness=On-time}                                     43.45%      97.85%  1.1110  highest confidence
+     2 {volatility_tier=Low} => {filing_timeliness=On-time}                                                   27.31%      91.30%  1.0367  highest confidence
+     3 {size_category=Mega-cap} => {filing_timeliness=On-time}                                                25.98%      90.25%  1.0248  
+     4 {volatility_tier=Medium} => {filing_timeliness=On-time}                                                23.31%      88.83%  1.0087  
+     5 {reaction_category=Strong Negative} => {filing_timeliness=On-time}                                     23.67%      88.61%  1.0062  
+     6 {filing_timeliness=On-time} => {event_category=Financial/Earnings}                                     43.45%      49.33%  1.1110  
+     7 {filing_timeliness=On-time} => {volatility_tier=Low}                                                   27.31%      31.01%  1.0367  
+     8 {filing_timeliness=On-time} => {size_category=Mega-cap}                                                25.98%      29.50%  1.0248  
+     9 {filing_timeliness=On-time} => {reaction_category=Strong Negative}                                     23.67%      26.88%  1.0062  lowest confidence
+    10 {filing_timeliness=On-time} => {volatility_tier=Medium}                                                23.31%      26.47%  1.0087  lowest confidence
+  Ties at the selection boundaries: between 2nd and 3rd highest: no, between 2nd and 3rd lowest: no
+
+STEP 4: INTERESTINGNESS MEASURES FOR THE 2 HIGHEST-CONFIDENCE RULES
+  {event_category=Financial/Earnings} => {filing_timeliness=On-time}
+    f11 178,765  f10 3,930  f01 183,587  f00 45,158  (f1+ 182,695, f+1 362,352, N 411,440)
+    lift 1.1110  Jaccard 0.4881  cosine 0.6948  Piatetsky-Shapiro +0.043425  all-confidence 0.4933
+  {volatility_tier=Low} => {filing_timeliness=On-time}
+    f11 112,370  f10 10,710  f01 249,982  f00 38,378  (f1+ 123,080, f+1 362,352, N 411,440)
+    lift 1.0367  Jaccard 0.3012  cosine 0.5321  Piatetsky-Shapiro +0.009660  all-confidence 0.3101
+
+STEP 5: SUPPLEMENTARY RULE A -- filing_timeliness=Late => reaction_category=X, inside one event_category
+  profile_matched_rate: the reaction mix the Late rows would show if each had the rate of its own size_category x volatility_tier cell inside the category. lift_vs_profile_matched above 1 means more than the company profile of late filers explains.
+  (all filings): 411,440 filings, 2,335 of them Late. Chi-square (Late vs not, x 5 reactions) 29.9, dof 4, p 5.17e-06, Cramer's V 0.0085
+    => Strong Negative     555 rows  confidence  23.77%  base  26.71%  lift 0.8898  matched rate  29.62%  lift vs matched 0.8024
+    => Negative            496 rows  confidence  21.24%  base  19.44%  lift 1.0927  matched rate  18.06%  lift vs matched 1.1764
+    => Neutral             294 rows  confidence  12.59%  base  10.06%  lift 1.2515  matched rate   9.08%  lift vs matched 1.3863
+    => Positive            448 rows  confidence  19.19%  base  18.74%  lift 1.0237  matched rate  16.98%  lift vs matched 1.1300
+    => Strong Positive     542 rows  confidence  23.21%  base  25.05%  lift 0.9268  matched rate  26.26%  lift vs matched 0.8839
+  Financial/Earnings: 182,695 filings, 854 of them Late. Chi-square (Late vs not, x 5 reactions) 103.7, dof 4, p 1.57e-21, Cramer's V 0.0238
+    => Strong Negative     181 rows  confidence  21.19%  base  29.27%  lift 0.7241  matched rate  30.17%  lift vs matched 0.7025
+    => Negative            194 rows  confidence  22.72%  base  16.83%  lift 1.3498  matched rate  16.78%  lift vs matched 1.3539
+    => Neutral             107 rows  confidence  12.53%  base   8.25%  lift 1.5187  matched rate   8.23%  lift vs matched 1.5218
+    => Positive            201 rows  confidence  23.54%  base  16.68%  lift 1.4111  matched rate  16.25%  lift vs matched 1.4481
+    => Strong Positive     171 rows  confidence  20.02%  base  28.97%  lift 0.6912  matched rate  28.56%  lift vs matched 0.7010
+  Management/Governance: 97,573 filings, 481 of them Late. Chi-square (Late vs not, x 5 reactions) 13.2, dof 4, p 0.0101, Cramer's V 0.0117
+    => Strong Negative     107 rows  confidence  22.25%  base  22.62%  lift 0.9833  matched rate  26.34%  lift vs matched 0.8446
+    => Negative            104 rows  confidence  21.62%  base  23.37%  lift 0.9253  matched rate  21.39%  lift vs matched 1.0111
+    => Neutral              63 rows  confidence  13.10%  base  12.42%  lift 1.0545  matched rate  10.79%  lift vs matched 1.2135
+    => Positive             85 rows  confidence  17.67%  base  22.01%  lift 0.8028  matched rate  19.60%  lift vs matched 0.9018
+    => Strong Positive     122 rows  confidence  25.36%  base  19.58%  lift 1.2957  matched rate  21.89%  lift vs matched 1.1587
+  Other: 62,626 filings, 524 of them Late. Chi-square (Late vs not, x 5 reactions) 3.8, dof 4, p 0.432, Cramer's V 0.0078
+    => Strong Negative     126 rows  confidence  24.05%  base  23.45%  lift 1.0253  matched rate  26.88%  lift vs matched 0.8947
+    => Negative            104 rows  confidence  19.85%  base  21.44%  lift 0.9259  matched rate  19.34%  lift vs matched 1.0262
+    => Neutral              72 rows  confidence  13.74%  base  11.95%  lift 1.1503  matched rate  10.39%  lift vs matched 1.3226
+    => Positive             97 rows  confidence  18.51%  base  20.71%  lift 0.8940  matched rate  18.42%  lift vs matched 1.0052
+    => Strong Positive     125 rows  confidence  23.85%  base  22.46%  lift 1.0621  matched rate  24.98%  lift vs matched 0.9550
+  M&A/Contracts: 59,395 filings, 409 of them Late. Chi-square (Late vs not, x 5 reactions) 7.7, dof 4, p 0.105, Cramer's V 0.0114
+    => Strong Negative     122 rows  confidence  29.83%  base  27.75%  lift 1.0750  matched rate  33.37%  lift vs matched 0.8938
+    => Negative             81 rows  confidence  19.80%  base  19.20%  lift 1.0313  matched rate  15.96%  lift vs matched 1.2410
+    => Neutral              44 rows  confidence  10.76%  base   9.95%  lift 1.0817  matched rate   7.92%  lift vs matched 1.3576
+    => Positive             53 rows  confidence  12.96%  base  18.18%  lift 0.7129  matched rate  14.61%  lift vs matched 0.8868
+    => Strong Positive     109 rows  confidence  26.65%  base  24.92%  lift 1.0692  matched rate  28.13%  lift vs matched 0.9474
+  Legal/Regulatory: 7,413 filings, 49 of them Late. Chi-square (Late vs not, x 5 reactions) 1.4, dof 4, p 0.846, Cramer's V 0.0137
+    => Strong Negative      16 rows  confidence  32.65%  base  38.43%  lift 0.8496  matched rate  42.39%  lift vs matched 0.7703
+    => Negative              8 rows  confidence  16.33%  base  15.59%  lift 1.0470  matched rate  13.99%  lift vs matched 1.1673
+    => Neutral               4 rows  confidence   8.16%  base   7.80%  lift 1.0470  matched rate   6.51%  lift vs matched 1.2534
+    => Positive              9 rows  confidence  18.37%  base  13.34%  lift 1.3767  matched rate  11.63%  lift vs matched 1.5799
+    => Strong Positive      12 rows  confidence  24.49%  base  24.83%  lift 0.9861  matched rate  25.48%  lift vs matched 0.9610
+  Capital/Financing: 1,691 filings, 17 of them Late. Chi-square (Late vs not, x 5 reactions) 1.4, dof 4, p 0.84, Cramer's V 0.0290
+    => Strong Negative       3 rows  confidence  17.65%  base  19.22%  lift 0.9182  matched rate  21.20%  lift vs matched 0.8323
+    => Negative              4 rows  confidence  23.53%  base  25.49%  lift 0.9232  matched rate  23.72%  lift vs matched 0.9921
+    => Neutral               4 rows  confidence  23.53%  base  13.96%  lift 1.6859  matched rate  13.77%  lift vs matched 1.7085
+    => Positive              3 rows  confidence  17.65%  base  23.48%  lift 0.7517  matched rate  22.92%  lift vs matched 0.7701
+    => Strong Positive       3 rows  confidence  17.65%  base  17.86%  lift 0.9881  matched rate  18.39%  lift vs matched 0.9594
+  Security Incident: 47 filings, 1 of them Late. Chi-square (Late vs not, x 5 reactions) 1.5, dof 4, p 0.826, Cramer's V 0.1790
+    => Strong Negative       0 rows  confidence   0.00%  base  17.02%  lift 0.0000  matched rate   0.00%  lift vs matched nan
+    => Negative              1 rows  confidence 100.00%  base  40.43%  lift 2.4737  matched rate  50.00%  lift vs matched 2.0000
+    => Neutral               0 rows  confidence   0.00%  base   4.26%  lift 0.0000  matched rate  25.00%  lift vs matched 0.0000
+    => Positive              0 rows  confidence   0.00%  base  17.02%  lift 0.0000  matched rate  25.00%  lift vs matched 0.0000
+    => Strong Positive       0 rows  confidence   0.00%  base  21.28%  lift 0.0000  matched rate   0.00%  lift vs matched nan
+
+STEP 6: SUPPLEMENTARY RULE B -- size_category x reaction_category inside event_category=Financial/Earnings
+  182,695 filings. Chi-square 3,258.8, dof 12, p 0, Cramer's V 0.0771 (volatility_tier x reaction in the same rows: V 0.1623)
+  Lift (row: size_category, column: reaction_category):
+reaction_category  Strong Negative  Negative  Neutral  Positive  Strong Positive
+size_category                                                                   
+Small                       1.3224    0.8095   0.7375    0.7115           1.0258
+Mid                         1.0424    0.9522   0.9539    0.9249           1.0412
+Large                       0.9320    1.0213   1.0276    1.0561           1.0162
+Mega-cap                    0.8289    1.1378   1.1754    1.1882           0.9345
+  Rows behind each cell:
+reaction_category  Strong Negative  Negative  Neutral  Positive  Strong Positive
+size_category                                                                   
+Small                        12985      4570     2041      3981             9969
+Mid                          13443      7060     3467      6796            13289
+Large                        14024      8836     4358      9055            15134
+Mega-cap                     13026     10280     5206     10640            14535
+
+FLAGS
+  1. The top itemsets follow the most common single items, not strong associations. filing_timeliness=On-time is 88.07% of filings and event_category=Financial/Earnings 44.40%, so the itemsets that pair them with other common items lead. The lift of all 10 rules runs 1.0062 to 1.1110, close to 1 (independence).
+  2. Reaction day 0 is the first trading day on or after report_date (the event date), not filing_date. Median trading_date minus filing_date: On-time 0 days, Slightly Late -6, Late -27. So for a Late filing, reaction_category measures the market around the underlying event, about a month before the 8-K was filed, not a reaction to the late filing. Rule A tests whether late filers had different event-day reactions, not whether lateness moved the price.
+  3. Rule A rests on few rows: Late is 2,335 of 411,440 filings (0.57%), and 854 of them are Financial/Earnings; the smallest cell behind a Financial/Earnings lift is 107 rows. Late filings by event_category: Financial/Earnings 854, Other 524, Management/Governance 481, M&A/Contracts 409, Legal/Regulatory 49, Capital/Financing 17, Security Incident 1.
+  4. Rule A controls for event_category (by fixing it) and, in the matched columns, for size_category x volatility_tier. It does not control for the company itself; companies that file late repeatedly count once per filing.
+  5. volatility_tier is circular as a predictor of reaction size: it is quartiles of trailing_volatility_1y, a single October 2026 value computed partly from the same returns the reactions are measured on. Itemsets and rules pairing volatility_tier with a Strong reaction partly restate that.
+  6. size_category, volatility_tier and sector are October 2026 snapshots attached to filings back to 2016-01-04. size_category is quartiles of this dataset's companies (Mega-cap starts at $5.8B here).
+  7. Rows are not independent: 38,102 (9.26%) share a company and trading day with another filing and therefore share its CAR and reaction_category. Support counts each of them; chi-square p-values treat them as independent, so read them as optimistic.
+
+WROTE
+  processed/association_events.csv (411,440 rows), association_itemsets.csv (1120 rows), association_rules.csv (10 rules),
+  association_rule_a_late.csv, association_rule_b_size.csv; 220227286.xlsx: T1_Association_Data, T1_Association_Results, T1_Association_Notes

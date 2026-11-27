@@ -1,0 +1,53 @@
+{
+  "settings": {
+    "TASK": "regression",
+    "USE_TIME_CYCLES": true,
+    "CAUSAL_READOUT": false,
+    "DROP_LOOKAHEAD_FEATURES": true,
+    "SEED": 0,
+    "CLASS_WEIGHTED_LOSS": "N/A"
+  },
+  "metrics": {
+    "CAR_MAE_model": 0.08341192454099655,
+    "CAR_MAE_baseline": 0.083384208381176,
+    "R2_all_events": 0.00183868408203125,
+    "R2_trimmed": 0.0019903182983398438,
+    "direction_accuracy_model": 0.5060147458284827,
+    "direction_accuracy_baseline": 0.5353545578782204,
+    "reaction_accuracy_model": 0.3423259266757774,
+    "reaction_accuracy_baseline": 0.322265526142633
+  },
+  "runtime_s": 745.759158372879,
+  "epochs_completed": 15,
+  "events": {
+    "train": 327527,
+    "validation": 24642,
+    "test": 59271,
+    "dropped_unreliable": 245
+  },
+  "all_settings": {
+    "MAX_HISTORY_LEN": 128,
+    "MIN_GAP_DAY0": 2,
+    "MIN_GAP_CAR1": 3,
+    "MIN_GAP_CAR5": 7,
+    "USE_TIME_CYCLES": true,
+    "TIME_CYCLE_PERIODS": [
+      5,
+      21,
+      63,
+      252
+    ],
+    "CAUSAL_READOUT": false,
+    "CLIP_RETURNS": 0.5,
+    "DROP_LOOKAHEAD_FEATURES": true,
+    "TRAIN_END": "2025-01-01",
+    "VAL_END": "2025-07-01",
+    "BATCH_SIZE": 64,
+    "EPOCHS": 15,
+    "LEARNING_RATE": 0.001,
+    "REACTION_LOSS_WEIGHT": 0.3,
+    "TASK": "regression",
+    "CLASS_WEIGHTED_LOSS": true,
+    "SEED": 0
+  }
+}

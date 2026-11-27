@@ -1,0 +1,28 @@
+Settings: USE_TIME_CYCLES=False, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=False, TASK=regression, CLASS_WEIGHTED_LOSS=True, SEED=1
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+epoch  1/15  train loss 0.4587  validation loss 0.4472
+epoch  2/15  train loss 0.4554  validation loss 0.4467
+epoch  3/15  train loss 0.4547  validation loss 0.4459
+epoch  4/15  train loss 0.4542  validation loss 0.4471
+epoch  5/15  train loss 0.4538  validation loss 0.4472
+epoch  6/15  train loss 0.4536  validation loss 0.4473
+epoch  7/15  train loss 0.4534  validation loss 0.4457
+epoch  8/15  train loss 0.4532  validation loss 0.4458
+epoch  9/15  train loss 0.4531  validation loss 0.4462
+epoch 10/15  train loss 0.4528  validation loss 0.4472
+epoch 11/15  train loss 0.4528  validation loss 0.4474
+epoch 12/15  train loss 0.4527  validation loss 0.4465
+epoch 13/15  train loss 0.4527  validation loss 0.4461
+epoch 14/15  train loss 0.4525  validation loss 0.4472
+epoch 15/15  train loss 0.4524  validation loss 0.4465
+
+TEST RESULTS (model vs. naive baseline), TASK=regression
+  CAR MAE              model 0.08297   baseline 0.08338
+  R^2 vs baseline      all events -0.0030   |CAR| <= 50% (98.7% of events) +0.0168
+  direction accuracy   model 0.515   baseline 0.535
+  reaction accuracy    model 0.343   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\results\regression_tc0_cr0_drop0_cwna_seed1.json
+
+---------------- stderr

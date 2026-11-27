@@ -1,0 +1,3 @@
+Settings: USE_TIME_CYCLES=False, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=False, TASK=regression, CLASS_WEIGHTED_LOSS=True, SEED=2
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti

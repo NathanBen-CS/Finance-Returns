@@ -1,0 +1,21 @@
+size_category,reaction_category,rule,size_rows,rule_rows,confidence,base_rate_in_category,lift
+Small,Strong Negative,size_category=Small => reaction_category=Strong Negative,33546,12985,0.3870804268765278,0.29271737048085605,1.3223691721494306
+Small,Negative,size_category=Small => reaction_category=Negative,33546,4570,0.13623084719489656,0.1682914146528367,0.80949374319494
+Small,Neutral,size_category=Small => reaction_category=Neutral,33546,2041,0.06084182913014965,0.08249815265880292,0.7374932306882093
+Small,Positive,size_category=Small => reaction_category=Positive,33546,3981,0.11867286710785191,0.16679164728098744,0.7115036576617552
+Small,Strong Positive,size_category=Small => reaction_category=Strong Positive,33546,9969,0.29717402969057416,0.28970141492651685,1.025794194916006
+Mid,Strong Negative,size_category=Mid => reaction_category=Strong Negative,44055,13443,0.30514130064691863,0.29271737048085605,1.0424434332190584
+Mid,Negative,size_category=Mid => reaction_category=Negative,44055,7060,0.160254227669958,0.1682914146528367,0.9522424420790664
+Mid,Neutral,size_category=Mid => reaction_category=Neutral,44055,3467,0.07869708319146522,0.08249815265880292,0.9539253989958028
+Mid,Positive,size_category=Mid => reaction_category=Positive,44055,6796,0.15426171830666213,0.16679164728098744,0.9248767598462733
+Mid,Strong Positive,size_category=Mid => reaction_category=Strong Positive,44055,13289,0.30164567018499605,0.28970141492651685,1.041229537182305
+Large,Strong Negative,size_category=Large => reaction_category=Strong Negative,51407,14024,0.27280331472367575,0.29271737048085605,0.9319683156333809
+Large,Negative,size_category=Large => reaction_category=Negative,51407,8836,0.17188320656719902,0.1682914146528367,1.0213426925061608
+Large,Neutral,size_category=Large => reaction_category=Neutral,51407,4358,0.08477444705973895,0.08249815265880292,1.0275920651259958
+Large,Positive,size_category=Large => reaction_category=Positive,51407,9055,0.17614332678429007,0.16679164728098744,1.0560680325169294
+Large,Strong Positive,size_category=Large => reaction_category=Strong Positive,51407,15134,0.2943957048650962,0.28970141492651685,1.01620389027016
+Mega-cap,Strong Negative,size_category=Mega-cap => reaction_category=Strong Negative,53687,13026,0.2426285692998305,0.29271737048085605,0.8288834000567062
+Mega-cap,Negative,size_category=Mega-cap => reaction_category=Negative,53687,10280,0.1914802466146367,0.1682914146528367,1.1377897500572773
+Mega-cap,Neutral,size_category=Mega-cap => reaction_category=Neutral,53687,5206,0.09696947119414383,0.08249815265880292,1.1754138495099593
+Mega-cap,Positive,size_category=Mega-cap => reaction_category=Positive,53687,10640,0.19818578054277572,0.16679164728098744,1.1882236537234974
+Mega-cap,Strong Positive,size_category=Mega-cap => reaction_category=Strong Positive,53687,14535,0.27073593234861326,0.28970141492651685,0.9345343805700286

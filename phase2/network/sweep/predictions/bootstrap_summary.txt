@@ -1,0 +1,33 @@
+Cluster bootstrap of balanced accuracy: 2,000 resamples, percentile 95% intervals, seed 2026.
+Test events: 59,271; clusters: 3,884 companies, 316 trading days.
+Recomputed balanced accuracy equals the logged value for every file (checked to 1e-12).
+
+RERUNS vs ORIGINAL RUNS (same settings and seed; GPU training is not bit-for-bit deterministic)
+  pred_full_seed0        rerun 51.93%   original sweep run 48 (direction_tc1_cr1_drop0_cw1_seed0) 51.74%   difference +0.20 points
+  pred_full_seed1        rerun 52.02%   original sweep run 72 (direction_tc1_cr1_drop0_cw1_seed1) 52.18%   difference -0.16 points
+  pred_histonly_seed0    rerun 51.80%   original controls run C5 (control_c_hist-full_cur-none_drop0_seed0) 51.68%   difference +0.13 points
+  pred_histonly_seed1    rerun 51.46%   original controls run C8 (control_c_hist-full_cur-none_drop0_seed1) 51.48%   difference -0.02 points
+  pred_nohist_seed0      rerun 52.14%   original controls run C3 (control_a_hist-none_cur-full_drop0_seed0) 52.14%   difference +0.00 points
+  pred_nohist_seed1      rerun 51.58%   original controls run C6 (control_a_hist-none_cur-full_drop0_seed1) 51.58%   difference +0.00 points
+
+BALANCED ACCURACY, 95% intervals (points; 'excl 50' = interval excludes 50%)
+  pred_full_seed0        51.93%   company: [51.49, 52.37] excl 50   day: [51.08, 52.76] excl 50   event: [51.54, 52.33] excl 50   widest: day
+  pred_full_seed1        52.02%   company: [51.59, 52.45] excl 50   day: [51.26, 52.71] excl 50   event: [51.64, 52.39] excl 50   widest: day
+  pred_histonly_seed0    51.80%   company: [51.35, 52.26] excl 50   day: [50.92, 52.66] excl 50   event: [51.43, 52.17] excl 50   widest: day
+  pred_histonly_seed1    51.46%   company: [51.02, 51.92] excl 50   day: [50.66, 52.22] excl 50   event: [51.10, 51.83] excl 50   widest: day
+  pred_nohist_seed0      52.14%   company: [51.73, 52.55] excl 50   day: [51.52, 52.78] excl 50   event: [51.76, 52.55] excl 50   widest: day
+  pred_nohist_seed1      51.58%   company: [51.21, 51.96] excl 50   day: [50.86, 52.29] excl 50   event: [51.24, 51.96] excl 50   widest: day
+
+PAIRED DIFFERENCES, same clusters resampled for both models (points; 'excl 0' = distinguishable from zero)
+  seed 0  full - nohist     company  -0.21   [-0.59, +0.19]
+  seed 0  full - nohist     day      -0.21   [-0.81, +0.38]
+  seed 0  full - nohist     event    -0.21   [-0.59, +0.17]
+  seed 0  full - histonly   company  +0.13   [-0.23, +0.49]
+  seed 0  full - histonly   day      +0.13   [-0.28, +0.53]
+  seed 0  full - histonly   event    +0.13   [-0.20, +0.48]
+  seed 1  full - nohist     company  +0.43   [+0.05, +0.83]  excl 0
+  seed 1  full - nohist     day      +0.43   [-0.06, +0.93]
+  seed 1  full - nohist     event    +0.43   [+0.04, +0.82]  excl 0
+  seed 1  full - histonly   company  +0.56   [+0.20, +0.93]  excl 0
+  seed 1  full - histonly   day      +0.56   [+0.16, +0.93]  excl 0
+  seed 1  full - histonly   event    +0.56   [+0.22, +0.89]  excl 0

@@ -1,0 +1,29 @@
+Settings: USE_TIME_CYCLES=True, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=0, HISTORY_MODE=none, CURRENT_MODE=full, DROP_INPUT_GROUPS=['timing'], SAVE_PREDICTIONS=False
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+DROP_INPUT_GROUPS: zeroing 5 of 63 current inputs: ['filing_timeliness=Late', 'filing_timeliness=On-time', 'filing_timeliness=Slightly Late', 'is_first_event', 'log_days_since_prev_filing']
+epoch  1/15  train loss 1.1535  validation loss 1.1319
+epoch  2/15  train loss 1.1507  validation loss 1.1303
+epoch  3/15  train loss 1.1503  validation loss 1.1335
+epoch  4/15  train loss 1.1501  validation loss 1.1302
+epoch  5/15  train loss 1.1500  validation loss 1.1393
+epoch  6/15  train loss 1.1498  validation loss 1.1293
+epoch  7/15  train loss 1.1496  validation loss 1.1325
+epoch  8/15  train loss 1.1495  validation loss 1.1295
+epoch  9/15  train loss 1.1496  validation loss 1.1308
+epoch 10/15  train loss 1.1494  validation loss 1.1331
+epoch 11/15  train loss 1.1494  validation loss 1.1349
+epoch 12/15  train loss 1.1493  validation loss 1.1334
+epoch 13/15  train loss 1.1493  validation loss 1.1319
+epoch 14/15  train loss 1.1492  validation loss 1.1322
+epoch 15/15  train loss 1.1492  validation loss 1.1337
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.526   baseline 0.535
+  recall               up events 0.419   down events 0.619
+  balanced accuracy    model 0.519   baseline 0.500
+  reaction accuracy    model 0.346   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\ablation\results\ablation_nohist_drop-timing_seed0.json
+
+---------------- stderr

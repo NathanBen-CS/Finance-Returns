@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "TASK": "direction",
+    "USE_TIME_CYCLES": true,
+    "CAUSAL_READOUT": true,
+    "DROP_LOOKAHEAD_FEATURES": false,
+    "SEED": 0,
+    "CLASS_WEIGHTED_LOSS": true,
+    "HISTORY_MODE": "full",
+    "CURRENT_MODE": "none"
+  },
+  "metrics": {
+    "direction_accuracy_model": 0.5064534089183581,
+    "direction_accuracy_baseline": 0.5353714295355233,
+    "recall_up_events": 0.6624786666182505,
+    "recall_down_events": 0.3710450018908357,
+    "balanced_accuracy_model": 0.5167618342545431,
+    "balanced_accuracy_baseline": 0.5,
+    "reaction_accuracy_model": 0.3304988949064467,
+    "reaction_accuracy_baseline": 0.322265526142633
+  },
+  "runtime_s": 826.7263288497925,
+  "epochs_completed": 15,
+  "events": {
+    "train": 327527,
+    "validation": 24642,
+    "test": 59271,
+    "dropped_unreliable": 245
+  },
+  "all_settings": {
+    "MAX_HISTORY_LEN": 128,
+    "MIN_GAP_DAY0": 2,
+    "MIN_GAP_CAR1": 3,
+    "MIN_GAP_CAR5": 7,
+    "USE_TIME_CYCLES": true,
+    "TIME_CYCLE_PERIODS": [
+      5,
+      21,
+      63,
+      252
+    ],
+    "CAUSAL_READOUT": true,
+    "CLIP_RETURNS": 0.5,
+    "DROP_LOOKAHEAD_FEATURES": false,
+    "HISTORY_MODE": "full",
+    "CURRENT_MODE": "none",
+    "TRAIN_END": "2025-01-01",
+    "VAL_END": "2025-07-01",
+    "BATCH_SIZE": 64,
+    "EPOCHS": 15,
+    "LEARNING_RATE": 0.001,
+    "REACTION_LOSS_WEIGHT": 0.3,
+    "TASK": "direction",
+    "CLASS_WEIGHTED_LOSS": true,
+    "SEED": 0
+  }
+}

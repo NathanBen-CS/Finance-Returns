@@ -1,0 +1,12 @@
+{
+  "TASK": "direction",
+  "USE_TIME_CYCLES": true,
+  "CAUSAL_READOUT": true,
+  "CLASS_WEIGHTED_LOSS": true,
+  "DROP_LOOKAHEAD_FEATURES": false,
+  "EPOCHS": 15,
+  "HISTORY_MODE": "full",
+  "CURRENT_MODE": "none",
+  "SEED": 1,
+  "SAVE_PREDICTIONS": true
+}

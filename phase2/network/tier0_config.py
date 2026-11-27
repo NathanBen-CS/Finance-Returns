@@ -11,7 +11,7 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data_phase2" / "processed"
 COMPANIES_CSV = DATA_DIR / "companies.csv"
 EVENTS_CSV = DATA_DIR / "events.csv"
 MARKET_REACTIONS_CSV = DATA_DIR / "market_reactions.csv"
-EVENTS_PKL = DATA_DIR / "tier0_events.pkl"        # written by prepare, read by train
+EVENTS_PKL = Path(__file__).resolve().parent / "tier0_events.pkl"   # written by prepare, read by train; kept beside the scripts
 
 # ---------------------------------------------------------------- history
 MAX_HISTORY_LEN = 128      # the model sees at most this many of a company's most recent past events
@@ -82,6 +82,25 @@ CLIP_RETURNS = 0.50        # past returns/CARs are clipped to +/-50% before use 
 # True = drop volatility_tier and trailing_volatility_1y from the inputs.
 # Run once each way; if results barely move, the look-ahead is not driving them.
 DROP_LOOKAHEAD_FEATURES = False
+
+# ---------------------------------------------------------------- input controls (tier0_controls.py)
+# Which of the two inputs carries the result? "full" = the normal input; "none" = remove it.
+# HISTORY_MODE = "none":  history_len is 0 for every event, so the model reads only its summary
+#                         token (a learned constant): no earlier filings at all.
+# CURRENT_MODE = "none":  the 63 current inputs (this filing's category/items/timeliness and the
+#                         company profile) are all zeros.
+# Both "full" = every run before these settings existed, unchanged.
+HISTORY_MODE = "full"
+CURRENT_MODE = "full"
+# DROP_INPUT_GROUPS: names of groups of the current inputs to zero out (the groups and their exact
+# columns are INPUT_GROUPS in tier0_train.py). The input width stays 63, so the network is identical.
+# Only the current vector is zeroed; past filings in the history keep all their columns.
+DROP_INPUT_GROUPS = ()
+
+# ---------------------------------------------------------------- saved predictions (bootstrap_ci.py)
+# True = write one row per test event to sweep/predictions/<run name>.csv (run name = the stem of
+# RESULTS_PATH, which the job runners set), then re-read it and check its balanced accuracy.
+SAVE_PREDICTIONS = False
 
 # ---------------------------------------------------------------- training
 TRAIN_END = "2025-01-01"   # events before this date train the model

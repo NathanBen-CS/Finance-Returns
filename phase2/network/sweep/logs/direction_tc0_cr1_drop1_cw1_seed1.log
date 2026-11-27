@@ -1,0 +1,28 @@
+Settings: USE_TIME_CYCLES=False, DROP_LOOKAHEAD_FEATURES=True, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=1
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+epoch  1/15  train loss 1.1506  validation loss 1.1308
+epoch  2/15  train loss 1.1463  validation loss 1.1292
+epoch  3/15  train loss 1.1454  validation loss 1.1288
+epoch  4/15  train loss 1.1448  validation loss 1.1326
+epoch  5/15  train loss 1.1442  validation loss 1.1269
+epoch  6/15  train loss 1.1439  validation loss 1.1287
+epoch  7/15  train loss 1.1436  validation loss 1.1283
+epoch  8/15  train loss 1.1436  validation loss 1.1282
+epoch  9/15  train loss 1.1434  validation loss 1.1281
+epoch 10/15  train loss 1.1431  validation loss 1.1295
+epoch 11/15  train loss 1.1428  validation loss 1.1307
+epoch 12/15  train loss 1.1427  validation loss 1.1292
+epoch 13/15  train loss 1.1427  validation loss 1.1276
+epoch 14/15  train loss 1.1426  validation loss 1.1298
+epoch 15/15  train loss 1.1425  validation loss 1.1314
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.508   baseline 0.535
+  recall               up events 0.707   down events 0.335
+  balanced accuracy    model 0.521   baseline 0.500
+  reaction accuracy    model 0.339   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\results\direction_tc0_cr1_drop1_cw1_seed1.json
+
+---------------- stderr

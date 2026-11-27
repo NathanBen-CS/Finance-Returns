@@ -1,0 +1,7 @@
+{
+  "TASK": "regression",
+  "USE_TIME_CYCLES": true,
+  "CAUSAL_READOUT": false,
+  "DROP_LOOKAHEAD_FEATURES": true,
+  "SEED": 0
+}

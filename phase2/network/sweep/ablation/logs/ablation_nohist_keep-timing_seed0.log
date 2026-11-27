@@ -1,0 +1,29 @@
+Settings: USE_TIME_CYCLES=True, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=0, HISTORY_MODE=none, CURRENT_MODE=full, DROP_INPUT_GROUPS=['category_items', 'size', 'sector', 'volatility', 'other_profile'], SAVE_PREDICTIONS=False
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+DROP_INPUT_GROUPS: zeroing 58 of 63 current inputs: ['event_category=Capital/Financing', 'event_category=Financial/Earnings', 'event_category=Legal/Regulatory', 'event_category=M&A/Contracts', 'event_category=Management/Governance', 'event_category=Other', 'event_category=Security Incident', 'item=1.01', 'item=1.02', 'item=1.03', 'item=1.04', 'item=1.05', 'item=2.01', 'item=2.02', 'item=2.03', 'item=2.04', 'item=2.05', 'item=2.06', 'item=3.01', 'item=3.02', 'item=3.03', 'item=4.01', 'item=4.02', 'item=5.01', 'item=5.02', 'item=5.03', 'item=5.04', 'item=5.05', 'item=5.06', 'item=5.07', 'item=5.08', 'item=7.01', 'item=8.01', 'item=9.01', 'log_employees', 'log_market_cap', 'log_revenue_ttm', 'log_trailing_volatility_1y', 'num_items_disclosed', 'sector=Basic Materials', 'sector=Communication Services', 'sector=Consumer Cyclical', 'sector=Consumer Defensive', 'sector=Energy', 'sector=Financial Services', 'sector=Healthcare', 'sector=Industrials', 'sector=Real Estate', 'sector=Technology', 'sector=Utilities', 'size_category=Large', 'size_category=Mega-cap', 'size_category=Mid', 'size_category=Small', 'volatility_tier=High', 'volatility_tier=Low', 'volatility_tier=Medium', 'volatility_tier=Very High']
+epoch  1/15  train loss 1.1726  validation loss 1.1646
+epoch  2/15  train loss 1.1718  validation loss 1.1626
+epoch  3/15  train loss 1.1717  validation loss 1.1607
+epoch  4/15  train loss 1.1717  validation loss 1.1624
+epoch  5/15  train loss 1.1717  validation loss 1.1616
+epoch  6/15  train loss 1.1717  validation loss 1.1603
+epoch  7/15  train loss 1.1717  validation loss 1.1596
+epoch  8/15  train loss 1.1716  validation loss 1.1606
+epoch  9/15  train loss 1.1716  validation loss 1.1604
+epoch 10/15  train loss 1.1716  validation loss 1.1616
+epoch 11/15  train loss 1.1716  validation loss 1.1610
+epoch 12/15  train loss 1.1716  validation loss 1.1625
+epoch 13/15  train loss 1.1715  validation loss 1.1614
+epoch 14/15  train loss 1.1716  validation loss 1.1621
+epoch 15/15  train loss 1.1716  validation loss 1.1617
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.522   baseline 0.535
+  recall               up events 0.273   down events 0.739
+  balanced accuracy    model 0.506   baseline 0.500
+  reaction accuracy    model 0.316   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\ablation\results\ablation_nohist_keep-timing_seed0.json
+
+---------------- stderr

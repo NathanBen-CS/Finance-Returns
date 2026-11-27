@@ -1,0 +1,95 @@
+EECS 4412 Phase 3, Task 2: sequential analysis of reactions across a company's filings
+======================================================================
+Merged events + market_reactions (inner) + companies (left): 411,685 rows; dropped 245 with price_data_unreliable; 411,440 filings from 3,900 companies (asserted).
+
+STEP 1: ONE SEQUENCE PER COMPANY, IN FILING ORDER
+  Sorted by ticker, filing_date, event_id. Sequence length per company: median 102, min 1, max 1,222.
+  Trading-day calendar: the 2,702 distinct trading dates in the data (2016-01-04 to 2026-10-01), as in network/tier0_prepare_data.py. The gap is counted between the two filings' reaction day 0 (trading_date).
+
+STEP 2: CONSECUTIVE TRANSITIONS, ALL FILINGS
+  407,540 transitions (411,440 filings minus each company's first). Gap in trading days: median 14, 25% 5, 75% 30, max 1,886.
+  6,572 transitions have the earlier-filed filing's reaction day after the later one's (report_date order differs from filing_date order); their gap is taken as the absolute value.
+  All 25 patterns, by support:
+      # pattern                                       count  support  confidence  curr base    lift
+      1 <Strong Negative> -> <Strong Negative>       40,797   10.01%      37.57%     26.70%  1.4067
+      2 <Strong Positive> -> <Strong Positive>       34,584    8.49%      33.86%     25.01%  1.3537
+      3 <Strong Negative> -> <Strong Positive>       27,317    6.70%      25.15%     25.01%  1.0056
+      4 <Strong Positive> -> <Strong Negative>       26,932    6.61%      26.37%     26.70%  0.9874
+      5 <Negative> -> <Negative>                     20,784    5.10%      26.24%     19.46%  1.3484
+      6 <Positive> -> <Positive>                     19,998    4.91%      26.14%     18.75%  1.3943
+      7 <Negative> -> <Strong Negative>              17,390    4.27%      21.96%     26.70%  0.8222
+      8 <Strong Negative> -> <Negative>              17,190    4.22%      15.83%     19.46%  0.8133
+      9 <Strong Positive> -> <Negative>              16,447    4.04%      16.10%     19.46%  0.8274
+     10 <Strong Positive> -> <Positive>              16,235    3.98%      15.90%     18.75%  0.8479
+     11 <Positive> -> <Strong Positive>              16,168    3.97%      21.13%     25.01%  0.8448
+     12 <Negative> -> <Strong Positive>              16,041    3.94%      20.25%     25.01%  0.8097
+     13 <Negative> -> <Positive>                     15,831    3.88%      19.99%     18.75%  1.0663
+     14 <Positive> -> <Negative>                     15,764    3.87%      20.60%     19.46%  1.0587
+     15 <Positive> -> <Strong Negative>              15,556    3.82%      20.33%     26.70%  0.7613
+     16 <Strong Negative> -> <Positive>              15,506    3.80%      14.28%     18.75%  0.7617
+     17 <Negative> -> <Neutral>                       9,156    2.25%      11.56%     10.07%  1.1475
+     18 <Neutral> -> <Negative>                       9,129    2.24%      22.22%     19.46%  1.1417
+     19 <Positive> -> <Neutral>                       9,026    2.21%      11.80%     10.07%  1.1710
+     20 <Neutral> -> <Positive>                       8,827    2.17%      21.48%     18.75%  1.1460
+     21 <Neutral> -> <Strong Negative>                8,158    2.00%      19.86%     26.70%  0.7435
+     22 <Strong Positive> -> <Neutral>                7,939    1.95%       7.77%     10.07%  0.7716
+     23 <Neutral> -> <Strong Positive>                7,829    1.92%      19.05%     25.01%  0.7618
+     24 <Strong Negative> -> <Neutral>                7,792    1.91%       7.17%     10.07%  0.7122
+     25 <Neutral> -> <Neutral>                        7,144    1.75%      17.39%     10.07%  1.7259
+  curr base rate among transitions vs among all filings: Strong Negative 26.70% / 26.71%, Negative 19.46% / 19.44%, Neutral 10.07% / 10.06%, Positive 18.75% / 18.74%, Strong Positive 25.01% / 25.05%
+  Rank 3: <Strong Negative> -> <Strong Positive> 27,317 (6.70%). No tie at the cut-off.
+  The 2 most frequent patterns as sequential rules:
+    Strong Negative => Strong Negative (next filing): support 10.01% (40,797), confidence 37.57% (40,797 / 108,602), base rate 26.70%, lift 1.4067
+    Strong Positive => Strong Positive (next filing): support 8.49% (34,584), confidence 33.86% (34,584 / 102,137), base rate 25.01%, lift 1.3537
+  Highest-confidence pattern of all 25, for reference: <Strong Negative> -> <Strong Negative> confidence 37.57%, lift 1.4067, support 10.01%.
+
+STEP 3: ROBUSTNESS
+  A: transitions inside one (ticker, event_category): the previous filing is the company's previous filing of the same category.
+  B: split at the median gap of 14 trading days: short = gap <= 14, long = gap > 14 (51.74% short; the median value itself holds 8,552 transitions).
+  Extra: gap >= 3 trading days, so the two CAR[-1,+1] windows share no trading day. Pairs with gap 0 share day 0 and therefore the same CAR.
+  All consecutive filings: 407,540 transitions, 3,898 companies, median gap 14; same reaction as previous 30.26% (if independent 21.70%)
+    top 1: <Strong Negative> -> <Strong Negative>   support 10.01%  confidence 37.57%  lift 1.4067
+    top 2: <Strong Positive> -> <Strong Positive>   support 8.49%  confidence 33.86%  lift 1.3537
+  Robustness A: same event_category only: 393,498 transitions, 3,896 companies, median gap 49; same reaction as previous 28.02% (if independent 21.70%)
+    top 1: <Strong Negative> -> <Strong Negative>   support 9.26%  confidence 34.89%  lift 1.3031
+    top 2: <Strong Positive> -> <Strong Positive>   support 7.89%  confidence 31.49%  lift 1.2564
+  Robustness B: short gap: 210,846 transitions, 3,884 companies, median gap 5; same reaction as previous 35.67% (if independent 21.66%)
+    top 1: <Strong Negative> -> <Strong Negative>   support 11.77%  confidence 43.54%  lift 1.6313
+    top 2: <Strong Positive> -> <Strong Positive>   support 9.84%  confidence 39.23%  lift 1.6271
+  Robustness B: long gap: 196,694 transitions, 3,896 companies, median gap 31; same reaction as previous 24.45% (if independent 21.75%)
+    top 1: <Strong Negative> -> <Strong Negative>   support 8.12%  confidence 30.97%  lift 1.1590
+    top 2: <Strong Negative> -> <Strong Positive>   support 7.56%  confidence 28.82%  lift 1.1091
+  Extra: gap >= 3 trading days (no shared CAR day): 348,129 transitions, 3,898 companies, median gap 17; same reaction as previous 24.76% (if independent 21.62%)
+    top 1: <Strong Negative> -> <Strong Negative>   support 8.21%  confidence 31.05%  lift 1.1801
+    top 2: <Strong Negative> -> <Strong Positive>   support 7.46%  confidence 28.20%  lift 1.1344
+  The main top-2 patterns in every variant:
+    All consecutive filings                                   <Strong Negative> -> <Strong Negative>   rank  1  support 10.01%  confidence 37.57%  lift 1.4067
+    All consecutive filings                                   <Strong Positive> -> <Strong Positive>   rank  2  support 8.49%  confidence 33.86%  lift 1.3537
+    Robustness A: same event_category only                    <Strong Negative> -> <Strong Negative>   rank  1  support 9.26%  confidence 34.89%  lift 1.3031
+    Robustness A: same event_category only                    <Strong Positive> -> <Strong Positive>   rank  2  support 7.89%  confidence 31.49%  lift 1.2564
+    Robustness B: short gap                                   <Strong Negative> -> <Strong Negative>   rank  1  support 11.77%  confidence 43.54%  lift 1.6313
+    Robustness B: short gap                                   <Strong Positive> -> <Strong Positive>   rank  2  support 9.84%  confidence 39.23%  lift 1.6271
+    Robustness B: long gap                                    <Strong Negative> -> <Strong Negative>   rank  1  support 8.12%  confidence 30.97%  lift 1.1590
+    Robustness B: long gap                                    <Strong Positive> -> <Strong Positive>   rank  4  support 7.03%  confidence 28.10%  lift 1.0813
+    Extra: gap >= 3 trading days (no shared CAR day)          <Strong Negative> -> <Strong Negative>   rank  1  support 8.21%  confidence 31.05%  lift 1.1801
+    Extra: gap >= 3 trading days (no shared CAR day)          <Strong Positive> -> <Strong Positive>   rank  4  support 6.81%  confidence 27.34%  lift 1.0995
+  Gap 0 (same reaction day 0): 18,888 (4.63%) transitions; same reaction in 100.00% of them.
+
+STEP 4: EXTRA CHECK -- WITHIN-COMPANY SHUFFLE (20 shuffles, seed 42)
+  Each company keeps its own reactions, in a random order. What the shuffle still shows comes from companies differing in their reaction mix; what it loses is order.
+  <Strong Negative> -> <Strong Negative>: observed 40,797, shuffled 33,715 (sd 93), ratio 1.2101
+  <Strong Positive> -> <Strong Positive>: observed 34,584, shuffled 28,009 (sd 101), ratio 1.2348
+  Same reaction as previous: observed 30.26%; within-company shuffle 24.55% (sd 0.067%); if independent of company 21.70%.
+
+FLAGS
+  1. Reframing: Phase 2's persistence question compares CAR[-1,+1] with CAR[-1,+5] for the same filing (decay within one event). This task asks a different question: whether one filing's reaction predicts the same company's next filing's reaction (persistence across events).
+  2. Pairs that share reaction days inflate persistence. 18,888 (4.63%) transitions have the same reaction day 0 and so the same CAR and the same reaction_category by construction; gaps of 1-2 trading days share part of the CAR window. Same reaction as previous: 30.26% over all transitions, 24.76% with gap >= 3.
+  3. Once pairs that share CAR days are removed, little order effect is left. Same reaction as previous is 24.76% with gap >= 3; shuffling each company's reactions (which keeps its mix and removes order) gives 24.55%; independence from the company gives 21.70%. So of the 3.06 points above independence, 2.85 are matched by company mix alone (companies that often have Strong reactions keep having them, in any order). The shuffle covers all transitions, not only the gap >= 3 ones, so this split is approximate.
+  4. Order: filings are sequenced by filing_date as asked, but reactions are measured from report_date. 6,572 transitions (1.61%) have the earlier-filed filing's reaction day later than the next filing's.
+  5. lift uses curr's base rate among the transitions in each variant; among all filings the rates differ by at most 0.03 points.
+  6. Robustness A changes which pairs exist, not just their number: 393,498 transitions (vs 407,540), and its gaps are longer (median 49 trading days vs 14), and it keeps 7,545 (1.92%) gap-0 pairs (vs 18,888 in the main table).
+  7. Inherited from Phase 2: filings on the same company and trading day share their CAR; size and volatility are October 2026 snapshots; the universe has survivorship bias.
+
+WROTE
+  processed/sequential_events.csv (407,540 rows), sequential_patterns.csv (125 rows), sequential_summary.csv, sequential_shuffle_check.csv
+  220227286.xlsx: T2_Sequential_Data, T2_Sequential_Results, T2_Sequential_Notes

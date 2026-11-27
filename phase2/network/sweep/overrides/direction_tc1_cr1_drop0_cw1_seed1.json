@@ -1,0 +1,8 @@
+{
+  "TASK": "direction",
+  "USE_TIME_CYCLES": true,
+  "CAUSAL_READOUT": true,
+  "DROP_LOOKAHEAD_FEATURES": false,
+  "SEED": 1,
+  "CLASS_WEIGHTED_LOSS": true
+}

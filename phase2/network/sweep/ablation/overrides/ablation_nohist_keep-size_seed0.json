@@ -1,0 +1,18 @@
+{
+  "TASK": "direction",
+  "USE_TIME_CYCLES": true,
+  "CAUSAL_READOUT": true,
+  "CLASS_WEIGHTED_LOSS": true,
+  "DROP_LOOKAHEAD_FEATURES": false,
+  "EPOCHS": 15,
+  "HISTORY_MODE": "none",
+  "CURRENT_MODE": "full",
+  "SEED": 0,
+  "DROP_INPUT_GROUPS": [
+    "category_items",
+    "timing",
+    "sector",
+    "volatility",
+    "other_profile"
+  ]
+}

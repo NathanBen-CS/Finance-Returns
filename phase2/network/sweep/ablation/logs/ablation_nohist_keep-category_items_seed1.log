@@ -1,0 +1,29 @@
+Settings: USE_TIME_CYCLES=True, DROP_LOOKAHEAD_FEATURES=False, CAUSAL_READOUT=True, TASK=direction, CLASS_WEIGHTED_LOSS=True, SEED=1, HISTORY_MODE=none, CURRENT_MODE=full, DROP_INPUT_GROUPS=['timing', 'size', 'sector', 'volatility', 'other_profile'], SAVE_PREDICTIONS=False
+Split: 327,527 train / 24,642 validation / 59,271 test
+Using GPU: NVIDIA GeForce RTX 5060 Ti
+DROP_INPUT_GROUPS: zeroing 28 of 63 current inputs: ['filing_timeliness=Late', 'filing_timeliness=On-time', 'filing_timeliness=Slightly Late', 'is_first_event', 'log_days_since_prev_filing', 'log_employees', 'log_market_cap', 'log_revenue_ttm', 'log_trailing_volatility_1y', 'sector=Basic Materials', 'sector=Communication Services', 'sector=Consumer Cyclical', 'sector=Consumer Defensive', 'sector=Energy', 'sector=Financial Services', 'sector=Healthcare', 'sector=Industrials', 'sector=Real Estate', 'sector=Technology', 'sector=Utilities', 'size_category=Large', 'size_category=Mega-cap', 'size_category=Mid', 'size_category=Small', 'volatility_tier=High', 'volatility_tier=Low', 'volatility_tier=Medium', 'volatility_tier=Very High']
+epoch  1/15  train loss 1.1677  validation loss 1.1553
+epoch  2/15  train loss 1.1668  validation loss 1.1565
+epoch  3/15  train loss 1.1666  validation loss 1.1549
+epoch  4/15  train loss 1.1665  validation loss 1.1569
+epoch  5/15  train loss 1.1665  validation loss 1.1528
+epoch  6/15  train loss 1.1663  validation loss 1.1552
+epoch  7/15  train loss 1.1663  validation loss 1.1544
+epoch  8/15  train loss 1.1662  validation loss 1.1554
+epoch  9/15  train loss 1.1662  validation loss 1.1525
+epoch 10/15  train loss 1.1662  validation loss 1.1567
+epoch 11/15  train loss 1.1662  validation loss 1.1564
+epoch 12/15  train loss 1.1662  validation loss 1.1554
+epoch 13/15  train loss 1.1662  validation loss 1.1563
+epoch 14/15  train loss 1.1662  validation loss 1.1561
+epoch 15/15  train loss 1.1662  validation loss 1.1540
+
+TEST RESULTS (model vs. naive baseline), TASK=direction
+  direction accuracy   model 0.503   baseline 0.535
+  recall               up events 0.612   down events 0.409
+  balanced accuracy    model 0.510   baseline 0.500
+  reaction accuracy    model 0.295   baseline 0.322
+Above 0 / above baseline = real signal. At or below = this feature set does not predict CAR.
+results written to C:\Users\Natha\Desktop\DataMining\phase2\network\sweep\ablation\results\ablation_nohist_keep-category_items_seed1.json
+
+---------------- stderr
